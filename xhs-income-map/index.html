@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靠小红书月入十几万：一个人，干成了一家公司 · 逻辑图解</title>
+<style>
+  :root{
+    --bg:#f4f1ea;
+    --card:#fffdf8;
+    --ink:#2b2622;
+    --ink-soft:#6b6258;
+    --line:#e4ddd0;
+    --accent:#e8503a;
+    --accent-soft:#fde9e4;
+    --gold:#c9962f;
+    --green:#3f7d54;
+    --green-soft:#e7f1ea;
+    --blue:#3a6ea5;
+    --shadow:0 6px 24px rgba(60,48,36,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    padding:0 16px 80px;
+  }
+  .wrap{max-width:860px;margin:0 auto}
+
+  /* ===== Hero ===== */
+  header.hero{
+    padding:64px 0 36px;
+    text-align:center;
+  }
+  .tag{
+    display:inline-block;
+    font-size:13px;letter-spacing:2px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:5px 14px;border-radius:999px;
+    font-weight:600;margin-bottom:20px;
+  }
+  header.hero h1{
+    font-size:clamp(28px,5vw,42px);
+    line-height:1.3;font-weight:800;
+    letter-spacing:-.5px;
+  }
+  header.hero h1 .hl{color:var(--accent)}
+  .byline{margin-top:14px;color:var(--ink-soft);font-size:14px}
+  .hook{
+    margin:28px auto 0;max-width:660px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold);
+    border-radius:12px;
+    padding:20px 24px;
+    text-align:left;font-size:15.5px;
+    color:var(--ink-soft);
+    box-shadow:var(--shadow);
+  }
+  .hook b{color:var(--ink)}
+
+  /* ===== Section ===== */
+  section{margin-top:46px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .sec-num{
+    flex:none;width:34px;height:34px;border-radius:9px;
+    background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:16px;
+  }
+  .sec-head h2{font-size:22px;font-weight:800}
+  .sec-sub{color:var(--ink-soft);font-size:14px;margin-top:2px}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:22px 24px;box-shadow:var(--shadow);
+  }
+
+  /* core idea */
+  .core p{font-size:17px}
+  .core .em{
+    background:linear-gradient(transparent 60%,var(--accent-soft) 60%);
+    font-weight:700;color:var(--ink);
+  }
+
+  /* cases */
+  .cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .case{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:20px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .case::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:var(--accent)}
+  .case .who{font-size:13px;color:var(--ink-soft);margin-bottom:6px}
+  .case .num{font-size:26px;font-weight:800;color:var(--accent);line-height:1.2}
+  .case .desc{font-size:14px;margin-top:8px;color:var(--ink)}
+  .takeaway{
+    margin-top:16px;text-align:center;font-weight:700;font-size:15.5px;
+    color:var(--green);background:var(--green-soft);
+    padding:12px;border-radius:10px;
+  }
+
+  /* fail */
+  .fail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .fail{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px;box-shadow:var(--shadow);
+  }
+  .fail .step{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:6px}
+  .fail .t{font-weight:700;font-size:15px}
+  .root{
+    margin-top:16px;background:#fff4f2;border:1px dashed var(--accent);
+    border-radius:12px;padding:16px 20px;font-size:15px;
+  }
+  .root b{color:var(--accent)}
+
+  /* ===== Path / playbook ===== */
+  .flow{position:relative;padding-left:38px}
+  .flow::before{
+    content:"";position:absolute;left:16px;top:8px;bottom:8px;width:2px;background:var(--line);
+  }
+  .stepblock{position:relative;margin-bottom:24px}
+  .stepblock .dot{
+    position:absolute;left:-38px;top:0;width:34px;height:34px;border-radius:50%;
+    background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:15px;box-shadow:0 0 0 4px var(--bg);
+  }
+  .stepblock .body{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 22px;box-shadow:var(--shadow);
+  }
+  .stepblock h3{font-size:18px;font-weight:800;margin-bottom:6px}
+  .stepblock h3 span{font-size:13px;font-weight:600;color:var(--ink-soft);margin-left:6px}
+  ul.points{list-style:none;margin-top:8px}
+  ul.points li{position:relative;padding-left:20px;margin:8px 0;font-size:15px}
+  ul.points li::before{
+    content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;border-radius:50%;
+    background:var(--gold);
+  }
+  .points li b{color:var(--accent)}
+  .pill{
+    display:inline-block;font-size:12.5px;background:var(--accent-soft);color:var(--accent);
+    padding:2px 9px;border-radius:6px;font-weight:600;margin:2px 4px 2px 0;
+  }
+
+  /* money ladder */
+  .ladder{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .rung{
+    display:flex;align-items:center;gap:12px;
+    background:#fbf7ef;border:1px solid var(--line);border-radius:10px;padding:10px 14px;
+  }
+  .rung .lv{flex:none;font-weight:800;color:var(--gold);font-size:14px;width:60px}
+  .rung .tx{font-size:14.5px}
+  .rung .tx b{color:var(--ink)}
+
+  /* mindset */
+  .mind{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .mind .m{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px;box-shadow:var(--shadow);font-size:15px;
+  }
+  .mind .m .icn{font-size:22px;margin-bottom:6px}
+  .mind .m b{color:var(--green)}
+
+  /* final */
+  .final{
+    margin-top:44px;background:var(--ink);color:#f4f1ea;border-radius:18px;
+    padding:34px 30px;text-align:center;
+  }
+  .final .lbl{font-size:13px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:14px}
+  .final .chain{
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;
+    font-size:17px;font-weight:700;margin-bottom:18px;
+  }
+  .final .chain span{background:rgba(255,255,255,.1);padding:6px 14px;border-radius:8px}
+  .final .chain .arrow{background:none;color:var(--accent);font-size:18px;padding:0}
+  .final p{color:#d8d0c4;font-size:14.5px;max-width:620px;margin:0 auto;line-height:1.8}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:12.5px;margin-top:40px}
+  footer a{color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="tag">小红书变现 · 实操指南</div>
+    <h1>靠小红书月入十几万：<br><span class="hl">一个人，干成了一家公司</span></h1>
+    <div class="byline">原文 @longlongsongs · 整理自文章逻辑图解</div>
+    <div class="hook">
+      不敢相信！一个几乎<b>不写代码</b>的人，盯着小红书评论区里那些「求方法、求工具」的留言，
+      做了个小东西去把它们填上。从 <b>0 到 100 个用户</b>花了一个月，半年后，
+      月营收从<b>六千</b>做到了<b>一百多万</b>。
+    </div>
+  </header>
+
+  <!-- 1 核心观点 -->
+  <section class="core">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div><h2>核心观点</h2><div class="sec-sub">赚钱不是玄学，是流程</div></div>
+    </div>
+    <div class="card">
+      <p>小红书赚钱<span class="em">不是靠灵感或运气</span>，而是一套可拆解、可复制的流程。
+      重点不是「涨粉」或「写爆款」，而是<span class="em">先搞清楚卖给谁、怎么收钱</span>，再一步步执行。</p>
+    </div>
+  </section>
+
+  <!-- 2 成功案例 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div><h2>主要成功案例</h2><div class="sec-sub">普通人也能跑通</div></div>
+    </div>
+    <div class="cases">
+      <div class="case">
+        <div class="who">不写代码的人</div>
+        <div class="num">6千 → 100万+</div>
+        <div class="desc">从评论区挖「求方法/求工具」需求，做小工具填上。1 个月到 100 用户，半年月营收破百万。</div>
+      </div>
+      <div class="case">
+        <div class="who">1.7 万粉账号</div>
+        <div class="num">十几万</div>
+        <div class="desc">只卖简历模板，一个链接就做到十几万收入。</div>
+      </div>
+      <div class="case">
+        <div class="who">新手商家</div>
+        <div class="num">100 粉 → 8000+</div>
+        <div class="desc">首月粉丝仅 100，却成交 29 单，收入 8000+。</div>
+      </div>
+    </div>
+    <div class="takeaway">✓ 普通人 = 找到真实需求 + 重复执行，就能跑通</div>
+  </section>
+
+  <!-- 3 失败原因 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div><h2>新人常见失败原因</h2><div class="sec-sub">卡在哪三个环节</div></div>
+    </div>
+    <div class="fail-grid">
+      <div class="fail"><div class="step">卡点 1</div><div class="t">发笔记没人看</div><div class="sec-sub">流量起不来</div></div>
+      <div class="fail"><div class="step">卡点 2</div><div class="t">有人看但没人买</div><div class="sec-sub">流量不转化</div></div>
+      <div class="fail"><div class="step">卡点 3</div><div class="t">有流量但接不住</div><div class="sec-sub">变现路径缺失</div></div>
+    </div>
+    <div class="root">
+      <b>根源：</b>一上来就想涨粉 / 爆款，却没想清楚 <b>变现闭环</b>。
+    </div>
+  </section>
+
+  <!-- 4 实操路径 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <div><h2>核心实操路径</h2><div class="sec-sub">文章重点 · 六步走</div></div>
+    </div>
+    <div class="flow">
+
+      <div class="stepblock">
+        <div class="dot">1</div>
+        <div class="body">
+          <h3>搞懂平台机制</h3>
+          <ul class="points">
+            <li>流量来自<b>自然推荐、搜索（占半壁江山）、分享</b>三条路。</li>
+            <li>新笔记有保量（约 1000 曝光），靠点击率和互动推流——<b>评论/转发/关注权重最高</b>。</li>
+            <li>新号前期数据差很正常，<b>80% 爆款出现在第 2-3 个月</b>，坚持最重要。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="dot">2</div>
+        <div class="body">
+          <h3>选题<span>不靠想，靠搜</span></h3>
+          <ul class="points">
+            <li>搜
+              <span class="pill">求推荐</span><span class="pill">求方法</span><span class="pill">求攻略</span><span class="pill">小白求教</span>
+              找回复多、但没人卖的痛点。</li>
+            <li>验证需求：在<b>闲鱼 / 小红书</b>搜类似产品的销量。</li>
+            <li>关键：找到 <b>有人求、没人好好卖</b> 的真实需求。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="dot">3</div>
+        <div class="body">
+          <h3>账号准备</h3>
+          <ul class="points">
+            <li><b>一机一卡一号</b>，养号 3-5 天（刷内容、适度互动）。</li>
+            <li>资料优化：昵称 + 简介带<b>关键词</b>，做<b>垂直定位</b>。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="dot">4</div>
+        <div class="body">
+          <h3>内容产出</h3>
+          <ul class="points">
+            <li><b>对标优先</b>：找 1 万粉以内、点赞 &gt; 粉丝的账号，复制四件套——<b>选题、封面、标题、内容</b>。</li>
+            <li>标题用好奇 / 痛点 / 极限 / 恐吓类，关键词自然分布于标题、正文、图片文字、话题。</li>
+            <li>内容配比：<b>80% 营销笔记 + 20% 干货笔记</b>。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="dot">5</div>
+        <div class="body">
+          <h3>变现四条路<span>从轻到重</span></h3>
+          <div class="ladder">
+            <div class="rung"><div class="lv">最轻</div><div class="tx"><b>接广告</b> —— 蒲公英平台，千粉即可。</div></div>
+            <div class="rung"><div class="lv">↓</div><div class="tx"><b>带货</b> —— 赚佣金。</div></div>
+            <div class="rung"><div class="lv">↓</div><div class="tx"><b>卖虚拟产品 / 服务</b> —— 模板、资料、咨询，<b>最适合新人</b>，成本低。</div></div>
+            <div class="rung"><div class="lv">最重</div><div class="tx"><b>引流私域做高客单</b> —— 课程、社群等，注意红线。</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepblock">
+        <div class="dot">6</div>
+        <div class="body">
+          <h3>引流注意事项</h3>
+          <ul class="points">
+            <li>避免硬导流（<b>易封号</b>）。</li>
+            <li>相对安全方式：改号为微信号、粉丝群公告、置顶笔记委婉引导。</li>
+            <li><b>安全第一</b>，用小号承接。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5 心态 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <div><h2>心态与预期</h2><div class="sec-sub">长期主义</div></div>
+    </div>
+    <div class="mind">
+      <div class="m"><div class="icn">💰</div>第一笔钱可能只有<b>几百 / 几千</b>，很小但意义重大——证明流程跑通了。</div>
+      <div class="m"><div class="icn">🎯</div><b>选题 &gt; 文采，验证 &gt; 埋头，安全 &gt; 激进。</b></div>
+      <div class="m"><div class="icn">⏳</div>坚持<b>重复执行</b>，时间会放大结果。</div>
+    </div>
+  </section>
+
+  <!-- final -->
+  <div class="final">
+    <div class="lbl">一 句 话 总 结</div>
+    <div class="chain">
+      <span>搜需求</span><span class="arrow">→</span>
+      <span>验证</span><span class="arrow">→</span>
+      <span>对标重复发内容</span><span class="arrow">→</span>
+      <span>接住流量变现</span>
+    </div>
+    <p>小红书是普通人消费力强、适合变现的平台。核心就是这条闭环——
+    文章实用性强，适合正在做或准备做小红书的人，当作操作指南。</p>
+  </div>
+
+  <footer>
+    内容整理自 X 文章《靠小红书月入十几万：一个人，干成了一家公司》 · @longlongsongs<br>
+    本页面仅作个人阅读笔记的逻辑图解之用
+  </footer>
+
+</div>
+</body>
+</html>
