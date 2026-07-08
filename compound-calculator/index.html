@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIRE · 定投记录</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060b18;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif}
+.app{background:#0a0f1e;border-radius:20px;width:100%;max-width:480px;overflow:hidden;border:0.5px solid #1e2d4a}
+.topbar{background:#0d1428;padding:18px 22px 0;border-bottom:0.5px solid #1e2d4a}
+.topbar-title{font-size:12px;font-weight:500;color:#c9a84c;letter-spacing:0.1em;margin-bottom:14px}
+.tabs{display:flex}
+.tab{flex:1;padding:10px 4px;font-size:13px;font-weight:500;color:#4a6080;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;text-align:center;transition:color 0.2s}
+.tab.active{color:#c9a84c;border-bottom:2px solid #c9a84c}
+.panel{display:none;padding:20px 22px}
+.panel.active{display:block}
+.lbl{font-size:11px;color:#4a6080;margin-bottom:5px;margin-top:14px}
+.lbl:first-child{margin-top:0}
+.inp{width:100%;background:#060b18;border:0.5px solid #1e2d4a;border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:14px;outline:none;transition:border-color 0.2s}
+.inp:focus{border-color:#c9a84c}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addbtn{width:100%;margin-top:12px;padding:11px;background:#1a2540;border:0.5px solid #c9a84c;border-radius:10px;color:#c9a84c;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s}
+.addbtn:hover{background:#243660}
+.addbtn:active{opacity:0.8}
+.divider{height:0.5px;background:#1e2d4a;margin:16px 0}
+.records-title{font-size:11px;color:#4a6080;margin-bottom:8px}
+.record-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.record-list::-webkit-scrollbar{width:3px}
+.record-list::-webkit-scrollbar-track{background:transparent}
+.record-list::-webkit-scrollbar-thumb{background:#1e2d4a;border-radius:2px}
+.record-item{display:flex;justify-content:space-between;align-items:center;background:#060b18;border:0.5px solid #1e2d4a;border-radius:8px;padding:9px 12px}
+.rec-date{font-size:12px;color:#4a6080}
+.rec-amt{font-size:14px;font-weight:500;color:#c9a84c}
+.rec-del{font-size:18px;color:#2a3a54;background:none;border:none;cursor:pointer;padding:0 0 0 12px;line-height:1;transition:color 0.2s}
+.rec-del:hover{color:#e05a5a}
+.empty{font-size:13px;color:#2a3a54;text-align:center;padding:24px 0;line-height:1.8}
+.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px}
+.stat{background:#060b18;border:0.5px solid #1e2d4a;border-radius:10px;padding:12px}
+.stat-l{font-size:11px;color:#4a6080;margin-bottom:4px}
+.stat-n{font-size:16px;font-weight:500;color:#e8e8e8}
+.stat-n.gold{color:#c9a84c}
+.stat-n.green{color:#2ecc8a}
+.rate-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rate-lbl{font-size:11px;color:#4a6080;white-space:nowrap;min-width:80px}
+.rate-val{font-size:12px;font-weight:500;color:#c9a84c;min-width:36px;text-align:right}
+input[type=range]{flex:1;accent-color:#c9a84c;height:4px}
+.chart-wrap{position:relative;width:100%;height:230px;margin-top:14px}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:11px;color:#4a6080}
+.leg-dot{width:10px;height:3px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.hint{background:#060b18;border-left:2px solid #c9a84c;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;color:#4a6080;line-height:1.7;margin-top:14px}
+.no-data-hint{font-size:13px;color:#2a3a54;text-align:center;padding:60px 0;line-height:2}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-title">FIRE · 定投记录</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('record')">记录买入</button>
+      <button class="tab" onclick="switchTab('forecast')">未来预测</button>
+    </div>
+  </div>
+
+  <div class="panel active" id="panel-record">
+    <div class="inp-row">
+      <div>
+        <div class="lbl">买入日期</div>
+        <input class="inp" type="date" id="r-date">
+      </div>
+      <div>
+        <div class="lbl">买入金额（元）</div>
+        <input class="inp" type="number" id="r-amt" placeholder="200">
+      </div>
+    </div>
+    <button class="addbtn" onclick="addRecord()">+ 记录这笔买入</button>
+    <div class="divider"></div>
+    <div class="records-title">历史记录</div>
+    <div class="record-list" id="record-list"><div class="empty">还没有记录<br>每次买入后来这里登记一笔</div></div>
+    <div class="divider"></div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-l">累计投入</div><div class="stat-n gold" id="s-total">¥0</div></div>
+      <div class="stat"><div class="stat-l">买入次数</div><div class="stat-n" id="s-count">0 次</div></div>
+      <div class="stat"><div class="stat-l">平均每次</div><div class="stat-n" id="s-avg">—</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-forecast">
+    <div class="rate-row">
+      <div class="rate-lbl">预期年化收益</div>
+      <input type="range" id="f-rate" min="3" max="15" step="0.5" value="7" oninput="renderForecast()">
+      <div class="rate-val" id="f-rate-v">7.0%</div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-lbl">预测未来年数</div>
+      <input type="range" id="f-yrs" min="5" max="40" step="1" value="20" oninput="renderForecast()">
+      <div class="rate-val" id="f-yrs-v">20 年</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-l">预测终值</div><div class="stat-n gold" id="f-end">—</div></div>
+      <div class="stat"><div class="stat-l">累计投入</div><div class="stat-n" id="f-dep">—</div></div>
+      <div class="stat"><div class="stat-l">利息收益</div><div class="stat-n green" id="f-int">—</div></div>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="chart" role="img" aria-label="基于历史买入记录的未来资产增长预测曲线"></canvas>
+      <div class="no-data-hint" id="no-data" style="display:none">先去「记录买入」<br>添加几笔记录<br>曲线就会出现在这里</div>
+    </div>
+    <div class="legend">
+      <span><span class="leg-dot" style="background:#c9a84c"></span>预测总资产</span>
+      <span><span class="leg-dot" style="background:#2ecc8a"></span>累计投入</span>
+    </div>
+    <div class="hint" id="f-hint">基于你的历史记录推算平均月投入，向未来延伸。记录越多，预测越准确。</div>
+  </div>
+</div>
+
+<script>
+let records = JSON.parse(localStorage.getItem('fire_records') || '[]');
+let fChart = null;
+
+function save(){ localStorage.setItem('fire_records', JSON.stringify(records)); }
+function fmt(v){ return '¥' + Math.round(v).toLocaleString('zh-CN'); }
+function fmtW(v){ if(v >= 10000) return '¥' + (v/10000).toFixed(0) + '万'; return '¥' + Math.round(v); }
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['record','forecast'][i] === id));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if(id === 'forecast'){ renderForecast(); setTimeout(()=>{ if(fChart) fChart.resize(); }, 50); }
+}
+
+function addRecord(){
+  const d = document.getElementById('r-date').value;
+  const a = parseFloat(document.getElementById('r-amt').value);
+  if(!d || !a || a <= 0) return;
+  records.push({date: d, amt: a});
+  records.sort((a,b) => a.date.localeCompare(b.date));
+  document.getElementById('r-amt').value = '';
+  save();
+  renderList();
+  updateStats();
+}
+
+function delRecord(i){
+  records.splice(i, 1);
+  save();
+  renderList();
+  updateStats();
+}
+
+function renderList(){
+  const el = document.getElementById('record-list');
+  if(records.length === 0){
+    el.innerHTML = '<div class="empty">还没有记录<br>每次买入后来这里登记一笔</div>';
+    return;
+  }
+  el.innerHTML = [...records].reverse().map((r, ri) => {
+    const i = records.length - 1 - ri;
+    return `<div class="record-item">
+      <span class="rec-date">${r.date}</span>
+      <span style="display:flex;align-items:center">
+        <span class="rec-amt">${fmt(r.amt)}</span>
+        <button class="rec-del" onclick="delRecord(${i})">×</button>
+      </span>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(){
+  const total = records.reduce((s,r) => s + r.amt, 0);
+  const count = records.length;
+  document.getElementById('s-total').textContent = fmt(total);
+  document.getElementById('s-count').textContent = count + ' 次';
+  document.getElementById('s-avg').textContent = count > 0 ? fmt(total / count) : '—';
+}
+
+function monthsBetween(){
+  if(records.length < 2) return 1;
+  const first = new Date(records[0].date);
+  const last = new Date(records[records.length-1].date);
+  return Math.max(1, (last - first) / (1000*60*60*24*30.5));
+}
+
+function renderForecast(){
+  const rate = +document.getElementById('f-rate').value;
+  const yrs = +document.getElementById('f-yrs').value;
+  document.getElementById('f-rate-v').textContent = rate.toFixed(1) + '%';
+  document.getElementById('f-yrs-v').textContent = yrs + ' 年';
+
+  const noData = document.getElementById('no-data');
+  const canvas = document.getElementById('chart');
+
+  if(records.length === 0){
+    canvas.style.display = 'none';
+    noData.style.display = 'block';
+    document.getElementById('f-end').textContent = '—';
+    document.getElementById('f-dep').textContent = '—';
+    document.getElementById('f-int').textContent = '—';
+    return;
+  }
+
+  canvas.style.display = 'block';
+  noData.style.display = 'none';
+
+  const totalInvested = records.reduce((s,r) => s + r.amt, 0);
+  const avgPerMonth = totalInvested / monthsBetween();
+  const rm = rate / 100 / 12;
+  const labels = [], bals = [], deps = [];
+  const step = yrs <= 15 ? 3 : 6;
+
+  for(let m = 0; m <= yrs * 12; m++){
+    if(m % step !== 0 && m !== yrs * 12) continue;
+    const dep = totalInvested + avgPerMonth * m;
+    let bal = totalInvested;
+    for(let k = 1; k <= m; k++) bal = (bal + avgPerMonth) * (1 + rm);
+    const y = m / 12;
+    labels.push(m === 0 ? '现在' : (Number.isInteger(y) ? y + '年' : ''));
+    bals.push(Math.round(bal));
+    deps.push(Math.round(dep));
+  }
+
+  const finalBal = bals[bals.length-1];
+  const finalDep = deps[deps.length-1];
+  document.getElementById('f-end').textContent = fmt(finalBal);
+  document.getElementById('f-dep').textContent = fmt(finalDep);
+  document.getElementById('f-int').textContent = fmt(finalBal - finalDep);
+
+  if(!fChart){
+    fChart = new Chart(canvas, {
+      type: 'line',
+      data: { labels, datasets: [
+        { data: bals, borderColor: '#c9a84c', backgroundColor: 'rgba(201,168,76,0.08)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 },
+        { data: deps, borderColor: '#2ecc8a', backgroundColor: 'rgba(46,204,138,0.05)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 1.5 }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#4a6080', maxTicksLimit: 8 }},
+          y: { grid: { color: 'rgba(30,45,74,0.6)' }, ticks: { callback: v => fmtW(v), font: { size: 10 }, color: '#4a6080' }}
+        }
+      }
+    });
+  } else {
+    fChart.data.labels = labels;
+    fChart.data.datasets[0].data = bals;
+    fChart.data.datasets[1].data = deps;
+    fChart.update('none');
+  }
+}
+
+document.getElementById('r-date').valueAsDate = new Date();
+renderList();
+updateStats();
+renderForecast();
+</script>
+</body>
+</html>
