@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剥离运气 · 决策校准系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#13182370;
+    --bg-solid:#141a26;
+    --surface:#1c2333;
+    --surface-2:#222b3e;
+    --ink:#e9ecf4;
+    --ink-dim:#98a2b8;
+    --ink-faint:#697185;
+    --signal:#f0b94a;        /* 技能 / 真实信号 */
+    --signal-soft:#f0b94a26;
+    --noise:#6b8caf;         /* 运气 / 噪音 */
+    --noise-soft:#6b8caf22;
+    --line:#ffffff14;
+    --line-strong:#ffffff26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg-solid);
+    color:var(--ink);
+    font-family:"Noto Sans SC",system-ui,sans-serif;
+    font-weight:400;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* ambient grid background */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 18% 12%, #1d2740 0, transparent 45%),
+      radial-gradient(circle at 85% 8%, #20283b 0, transparent 40%),
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:auto,auto,64px 64px,64px 64px;
+    opacity:.5;
+    mask-image:linear-gradient(180deg,#000 0,#000 30%,transparent 90%);
+  }
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 28px}
+
+  /* ---- typographic atoms ---- */
+  .eyebrow{
+    font-family:"JetBrains Mono",monospace;
+    font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--signal);font-weight:500;
+    display:inline-flex;align-items:center;gap:.7em;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--signal);opacity:.7}
+  .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.02em}
+  .serif-en{font-family:"Instrument Serif",serif;font-style:normal;font-weight:400}
+
+  /* ---- hero ---- */
+  .hero{padding:118px 0 64px;position:relative}
+  .hero .tag{margin-bottom:34px}
+  .hero h1{
+    font-family:"Noto Serif SC",serif;font-weight:900;
+    font-size:clamp(2.6rem,7vw,4.7rem);line-height:1.08;
+    letter-spacing:-.01em;margin-bottom:30px;
+  }
+  .hero h1 .accent{color:var(--signal);position:relative;white-space:nowrap}
+  .hero h1 .strike{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--noise);text-decoration-thickness:2px}
+  .hero h1 small{
+    display:block;font-family:"Instrument Serif",serif;font-weight:400;
+    font-size:clamp(1.1rem,2.4vw,1.7rem);color:var(--ink-dim);
+    letter-spacing:.04em;margin-top:18px;line-height:1.4;
+  }
+  .hero .lede{
+    max-width:640px;font-size:1.06rem;color:var(--ink-dim);font-weight:300;
+    margin-top:8px;
+  }
+  .hero .lede b{color:var(--ink);font-weight:500}
+
+  /* ---- probability signature ---- */
+  .signature{
+    margin:54px 0 8px;padding:30px 30px 22px;
+    border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,#1a2132aa,#161c2999);
+    backdrop-filter:blur(2px);
+  }
+  .signature .cap{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .signature .cap span{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--ink-faint);letter-spacing:.04em}
+  .signature svg{width:100%;height:auto;display:block;overflow:visible}
+  .curve-path{fill:none;stroke:var(--signal);stroke-width:2.4;
+    stroke-dasharray:1400;stroke-dashoffset:1400;
+    animation:draw 2.4s .35s cubic-bezier(.4,0,.1,1) forwards}
+  .curve-fill{opacity:0;animation:fade 1.2s 1.8s forwards}
+  .tail-fill{opacity:0;animation:fade 1s 2.2s forwards}
+  .drop-line{opacity:0;animation:fade .6s 2.5s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes fade{to{opacity:1}}
+
+  /* ---- section frame ---- */
+  .section{padding:70px 0;border-top:1px solid var(--line)}
+  .sec-head{margin-bottom:44px}
+  .sec-head .eyebrow{margin-bottom:18px}
+  .sec-head h2{
+    font-family:"Noto Serif SC",serif;font-weight:700;
+    font-size:clamp(1.7rem,3.8vw,2.5rem);line-height:1.2;letter-spacing:-.005em;
+  }
+  .sec-head .sub{color:var(--ink-dim);font-weight:300;margin-top:14px;max-width:620px;font-size:1.02rem}
+
+  /* ---- trap cards (noise) ---- */
+  .traps{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .trap{
+    border:1px solid var(--line);border-left:2px solid var(--noise);
+    border-radius:12px;padding:26px 26px 24px;background:var(--noise-soft);
+  }
+  .trap .n{font-family:"Instrument Serif",serif;font-size:2.1rem;color:var(--noise);line-height:1;display:block;margin-bottom:14px}
+  .trap h3{font-family:"Noto Serif SC",serif;font-weight:700;font-size:1.22rem;margin-bottom:6px}
+  .trap .en{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--noise);letter-spacing:.04em;margin-bottom:14px;display:block}
+  .trap p{font-size:.96rem;color:var(--ink-dim);font-weight:300}
+  .bridge{margin-top:26px;font-size:.98rem;color:var(--ink-dim);font-weight:300;border-left:2px solid var(--line-strong);padding-left:18px}
+  .bridge b{color:var(--signal);font-weight:500}
+
+  /* ---- axis intro ---- */
+  .axes{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:8px}
+  .axis{padding:30px 28px;position:relative}
+  .axis:first-child{border-right:1px solid var(--line)}
+  .axis .dir{font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--signal);margin-bottom:12px;display:flex;align-items:center;gap:.6em}
+  .axis h3{font-family:"Noto Serif SC",serif;font-weight:700;font-size:1.3rem;margin-bottom:8px}
+  .axis p{font-size:.95rem;color:var(--ink-dim);font-weight:300}
+
+  /* ---- detail blocks ---- */
+  .block{padding:32px 0;border-bottom:1px solid var(--line)}
+  .block:last-child{border-bottom:none}
+  .block .label{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.16em;color:var(--signal);text-transform:uppercase;margin-bottom:14px;display:block}
+  .block h3{font-family:"Noto Serif SC",serif;font-weight:700;font-size:1.32rem;margin-bottom:12px}
+  .block p{color:var(--ink-dim);font-weight:300;margin-bottom:10px}
+  .block p:last-child{margin-bottom:0}
+  .block strong{color:var(--ink);font-weight:500}
+  .pillars{display:grid;gap:14px;margin-top:18px}
+  .pillar{display:flex;gap:16px;align-items:flex-start}
+  .pillar .dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--signal);margin-top:11px;box-shadow:0 0 0 4px var(--signal-soft)}
+  .pillar div{font-size:.97rem;color:var(--ink-dim);font-weight:300}
+  .pillar b{color:var(--ink);font-weight:500;font-family:"Noto Serif SC",serif}
+
+  /* ---- timeline tools ---- */
+  .tl{position:relative;margin-top:8px;padding-left:34px}
+  .tl::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:1px;background:linear-gradient(var(--noise),var(--signal))}
+  .tool{position:relative;padding:22px 0}
+  .tool:not(:last-child){border-bottom:1px solid var(--line)}
+  .tool::before{content:"";position:absolute;left:-30px;top:30px;width:11px;height:11px;border-radius:50%;background:var(--bg-solid);border:2px solid var(--noise)}
+  .tool.peak::before{border-color:var(--signal);background:var(--signal);box-shadow:0 0 14px var(--signal-soft)}
+  .tool .when{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--ink-faint);letter-spacing:.08em;margin-bottom:8px;display:block}
+  .tool h4{font-family:"Noto Serif SC",serif;font-weight:700;font-size:1.18rem;margin-bottom:8px}
+  .tool h4 em{font-family:"Instrument Serif",serif;font-style:normal;color:var(--signal);font-weight:400;font-size:1.05em;margin-left:.4em}
+  .tool p{font-size:.95rem;color:var(--ink-dim);font-weight:300}
+  .tool .q{color:var(--ink);font-weight:400;font-style:italic;border-left:2px solid var(--signal);padding-left:14px;margin-top:10px}
+  .badge{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:.66rem;letter-spacing:.1em;color:var(--signal);border:1px solid var(--signal);border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:middle;text-transform:uppercase}
+
+  /* ---- outcome split ---- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .out{border:1px solid var(--line);border-radius:12px;padding:28px 26px}
+  .out.bad{border-top:2px solid var(--noise)}
+  .out.good{border-top:2px solid var(--signal)}
+  .out .k{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:block}
+  .out.bad .k{color:var(--noise)}
+  .out.good .k{color:var(--signal)}
+  .out h3{font-family:"Noto Serif SC",serif;font-weight:700;font-size:1.18rem;margin-bottom:10px;line-height:1.4}
+  .out p{font-size:.95rem;color:var(--ink-dim);font-weight:300}
+
+  .closer{padding:64px 0 30px;text-align:center;border-top:1px solid var(--line)}
+  .closer p{font-family:"Instrument Serif",serif;font-size:clamp(1.4rem,3.5vw,2.1rem);line-height:1.5;color:var(--ink);max-width:680px;margin:0 auto}
+  .closer p .hl{color:var(--signal)}
+
+  footer{padding:30px 0 64px;border-top:1px solid var(--line)}
+  footer .row{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px}
+  footer span{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--ink-faint);letter-spacing:.04em}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:680px){
+    .traps,.axes,.split{grid-template-columns:1fr}
+    .axis:first-child{border-right:none;border-bottom:1px solid var(--line)}
+    .hero{padding:88px 0 48px}
+    .signature{padding:22px 18px 16px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .curve-path{stroke-dashoffset:0}
+    .curve-fill,.tail-fill,.drop-line{opacity:1}
+    .reveal{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <div class="tag"><span class="eyebrow">Decision Calibration · 对赌方法论</span></div>
+  <h1>
+    决策不是<span class="strike">非黑即白</span>，<br>
+    而是一场<span class="accent">概率博弈</span>。
+    <small>剥离运气成分 · 校准你的决策系统</small>
+  </h1>
+  <p class="lede">人脑被进化成<b>追求确定性、维护自我形象</b>的机器。这让我们在不确定中本能地自我欺骗——把好结果归功于技能，把坏结果归咎于运气。要打破它，需要引入两个外部视角：空间上的<b>求真团体</b>，与时间上的<b>未来视角</b>。</p>
+
+  <div class="signature reveal">
+    <div class="cap">
+      <span>每个决策 = 概率分布中的一次抽样</span>
+      <span class="mono">P(结果)</span>
+    </div>
+    <svg viewBox="0 0 880 220" role="img" aria-label="概率分布曲线：坏结果只是分布尾部的低概率事件">
+      <defs>
+        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f0b94a" stop-opacity=".26"/>
+          <stop offset="1" stop-color="#f0b94a" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- baseline -->
+      <line x1="20" y1="186" x2="860" y2="186" stroke="#ffffff20" stroke-width="1"/>
+      <!-- bell fill -->
+      <path class="curve-fill" d="M20,186 C220,186 300,30 440,30 C580,30 660,186 860,186 Z" fill="url(#sg)"/>
+      <!-- bad-tail highlight (left ~20%) -->
+      <path class="tail-fill" d="M20,186 C150,186 205,120 250,96 L250,186 Z" fill="#6b8caf26"/>
+      <!-- bell curve -->
+      <path class="curve-path" d="M20,186 C220,186 300,30 440,30 C580,30 660,186 860,186"/>
+      <!-- decision drop -->
+      <g class="drop-line">
+        <line x1="250" y1="96" x2="250" y2="186" stroke="#6b8caf" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <circle cx="250" cy="96" r="5" fill="#6b8caf"/>
+        <text x="250" y="208" fill="#6b8caf" font-family="'JetBrains Mono',monospace" font-size="12" text-anchor="middle">坏运气 · 20%</text>
+        <line x1="440" y1="30" x2="440" y2="186" stroke="#f0b94a" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <circle cx="440" cy="30" r="5" fill="#f0b94a"/>
+        <text x="440" y="208" fill="#f0b94a" font-family="'JetBrains Mono',monospace" font-size="12" text-anchor="middle">技能决定的中心</text>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<main>
+<!-- ───────────── 陷阱 ───────────── -->
+<section class="wrap section">
+  <div class="sec-head reveal">
+    <span class="eyebrow">01 — 为什么需要校准</span>
+    <h2>两大本能陷阱</h2>
+    <p class="sub">越聪明的人，越擅长用数据和逻辑为自己的偏见辩护。这两种本能让我们困在「以结果为导向」的误区里，无法从经验中提取真实反馈。</p>
+  </div>
+  <div class="traps reveal">
+    <div class="trap">
+      <span class="n">A</span>
+      <h3>动机性推理</h3>
+      <span class="en">Motivated Reasoning</span>
+      <p>先有结论，再找证据。全盘接受支持自己观点的信息，对反面信息视而不见。</p>
+    </div>
+    <div class="trap">
+      <span class="n">B</span>
+      <h3>自利性偏差</h3>
+      <span class="en">Self-serving Bias</span>
+      <p>把好结果归功于自己的高超技能，把坏结果归咎于糟糕的运气或外部环境。</p>
+    </div>
+  </div>
+  <p class="bridge reveal">克服自我欺骗的关键，是剥离运气成分——这需要两条相互垂直的外部视角轴：<b>空间维度</b>（外部的人）与<b>时间维度</b>（未来的你）。</p>
+</section>
+
+<!-- ───────────── 两轴 ───────────── -->
+<section class="wrap section">
+  <div class="sec-head reveal">
+    <span class="eyebrow">02 — 解法 · 两个外部视角</span>
+    <h2>把视角，从「当下的自我」中拉出来</h2>
+  </div>
+  <div class="axes reveal">
+    <div class="axis">
+      <span class="dir">↔ 空间轴</span>
+      <h3>求真团体</h3>
+      <p>引入高质量的外部监督，对冲无法自我察觉的「偏见盲点」。</p>
+    </div>
+    <div class="axis">
+      <span class="dir">↕ 时间轴</span>
+      <h3>心理时间旅行</h3>
+      <p>站到未来的节点反观现在，剥离当下情绪对决策的裹挟。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 求真团体 ───────────── -->
+<section class="wrap section">
+  <div class="sec-head reveal">
+    <span class="eyebrow">空间维度 · ↔</span>
+    <h2>建立多样化的求真团体</h2>
+    <p class="sub">无论多聪明，都无法消除自身的偏见盲点。最有效的方式，是引入一个「求真而非求安慰」的外部团体。</p>
+  </div>
+
+  <div class="block reveal">
+    <span class="label">机制一</span>
+    <h3>从「确认性思维」到「探索性思维」</h3>
+    <p>日常社交的默认规则是互相附和以维护情感——你抱怨失败，朋友陪你一起骂运气。求真团体的核心契约相反：<strong>成员有义务对你的观点提出异议，指出你逻辑中的漏洞。</strong></p>
+  </div>
+
+  <div class="block reveal">
+    <span class="label">机制二</span>
+    <h3>重塑奖励机制</h3>
+    <p>习惯由「提示—惯常行为—奖励」构成。求真团体通过改写「奖励」来重塑决策习惯：当你客观承认错误、或在成功中找出「纯属运气好」的成分时，团体给予的不是嘲笑，而是高度认同。<strong>这种社交认可，对冲掉了承认错误时的心理不适。</strong></p>
+  </div>
+
+  <div class="block reveal">
+    <span class="label">机制三</span>
+    <h3>事前责任制</h3>
+    <p>当你意识到这个决定未来要向一群聪明、追求准确性的人复盘和解释时，<strong>你在事前就会自动变得更严谨</strong>，强制自己去思考反面论点。</p>
+  </div>
+</section>
+
+<!-- ───────────── 心理时间旅行 ───────────── -->
+<section class="wrap section">
+  <div class="sec-head reveal">
+    <span class="eyebrow">时间维度 · ↑</span>
+    <h2>运用心理时间旅行</h2>
+    <p class="sub">人极易被当下的情绪（懊恼、愤怒、极度兴奋等「倾斜」状态）裹挟。把视角抽离到未来的不同节点，是对抗短视的四件工具。</p>
+  </div>
+
+  <div class="tl reveal">
+    <div class="tool">
+      <span class="when">TOOL 01 · 决策当下</span>
+      <h4>10-10-10 法则 <em>苏西·韦尔奇</em></h4>
+      <p>做艰难决策时，依次问自己三个问题，强迫大脑脱离当下的情绪放大效应，把影响力放回长期生命尺度去衡量：</p>
+      <p class="q">10 分钟后 / 10 个月后 / 10 年后，我会对这个决定作何感想？</p>
+    </div>
+
+    <div class="tool">
+      <span class="when">TOOL 02 · 行动之前</span>
+      <h4>情景规划 <em>Scenario Planning</em></h4>
+      <p>不要只想着最理想的结果。行动前列出未来所有可能的结果及其概率。<strong>当坏结果真的发生时，你不会觉得「世界不公」，而是理性认识到：这只是那 20% 的坏概率发生了。</strong></p>
+    </div>
+
+    <div class="tool">
+      <span class="when">TOOL 03 · 想象成功</span>
+      <h4>反向回顾 <em>Backcasting</em></h4>
+      <p>假设决策已取得巨大成功。站在那个终点往回看：「为了走到这一步，我都做对了哪些事？在哪些关键节点做出了正确选择？」用正向的逆向工程，梳理出实现目标的清晰路径。</p>
+    </div>
+
+    <div class="tool peak">
+      <span class="when">TOOL 04 · 想象失败</span>
+      <h4>预先检查 <em>Premortem</em><span class="badge">终极武器</span></h4>
+      <p>对付「过度乐观偏见」的终极武器。假设决策已彻底失败、遭遇毁灭性打击，站在废墟上往回看：</p>
+      <p class="q">究竟是哪些潜在隐患、被忽略的风险或执行失误，导致了这场灾难？</p>
+      <p>它迫使你把视野投向盲区，提前找出「坏运气」的藏身处，并在事前制定对冲策略。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 终极效果 ───────────── -->
+<section class="wrap section">
+  <div class="sec-head reveal">
+    <span class="eyebrow">03 — 终极效果</span>
+    <h2>剥离运气，校准决策系统</h2>
+    <p class="sub">当求真团体与心理时间旅行结合，你对待经验的态度会发生本质改变——能够准确辨别一个结果究竟是「决策失误」还是「纯属运气」。</p>
+  </div>
+  <div class="split reveal">
+    <div class="out bad">
+      <span class="k">↓ 遭遇失败时</span>
+      <h3>不因坏运气，随意更改好系统</h3>
+      <p>因为事前做过情景规划、又有团体的客观评估，你能辨别这是失误还是运气。若是后者，你不会自怨自艾，而是坚定维持原有的高质量决策系统，避免盲目调整。</p>
+    </div>
+    <div class="out good">
+      <span class="k">↑ 获得成功时</span>
+      <h3>不因好运气，产生致命傲慢</h3>
+      <p>团体和反向复盘会逼你承认其中哪些步骤只是侥幸，防止你把「错误的策略」当成「成功的经验」固化下来。</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap closer reveal">
+  <p>决策不再是简单的对与错，而是一场不断调整概率、管理不确定性、<span class="hl">从经验中提取真实信号</span>的长期博弈。</p>
+</section>
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <span>方法论源自 · 安妮·杜克《对赌 Thinking in Bets》</span>
+    <span>认知心理学 · 概率思维</span>
+  </div>
+</footer>
+
+<script>
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)}})
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
