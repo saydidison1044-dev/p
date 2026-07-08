@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>改变执行表 · 一次只做一件</title>
+<style>
+:root{
+  --bg:#07080c;
+  --gold:#e8b04b;
+  --gold-soft:#c9963d;
+  --gold-dim:rgba(232,176,75,.35);
+  --green:#5fc586;
+  --red:#e0705f;
+  --blue:#6fa8dc;
+  --text:#f0ede6;
+  --dim:#a39f95;
+  --faint:#5f5c55;
+  --glass:rgba(255,255,255,.035);
+  --glass-line:rgba(255,255,255,.09);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.8;
+  overflow-x:hidden;
+  padding-bottom:90px;
+}
+
+/* ---------- 背景层 ---------- */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.16;z-index:0;pointer-events:none;}
+.orb1{width:520px;height:520px;background:#e8b04b;top:-180px;left:-140px;animation:drift1 26s ease-in-out infinite alternate;}
+.orb2{width:460px;height:460px;background:#3d5a80;bottom:-160px;right:-120px;animation:drift2 32s ease-in-out infinite alternate;}
+.orb3{width:300px;height:300px;background:#7c4d2b;top:45%;left:60%;animation:drift1 40s ease-in-out infinite alternate-reverse;}
+@keyframes drift1{from{transform:translate(0,0) scale(1);}to{transform:translate(70px,50px) scale(1.15);}}
+@keyframes drift2{from{transform:translate(0,0) scale(1.1);}to{transform:translate(-60px,-40px) scale(.95);}}
+
+#confetti{position:fixed;inset:0;z-index:200;pointer-events:none;}
+
+.wrap{max-width:700px;margin:0 auto;padding:0 22px;position:relative;z-index:2;}
+
+/* ---------- HERO ---------- */
+.hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 40px;}
+.kicker{
+  color:var(--gold);font-size:13px;letter-spacing:8px;margin-bottom:20px;
+  opacity:0;animation:fadeUp 1s .2s forwards;
+}
+h1{
+  font-size:clamp(34px,7vw,52px);font-weight:800;line-height:1.25;letter-spacing:2px;
+  background:linear-gradient(120deg,#fff 20%,var(--gold) 55%,#fff 90%);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:fadeUp 1s .4s forwards,shine 6s linear 1.5s infinite;
+  opacity:0;
+}
+@keyframes shine{to{background-position:200% center;}}
+.hero-sub{
+  color:var(--dim);font-size:16px;margin-top:22px;max-width:540px;
+  opacity:0;animation:fadeUp 1s .7s forwards;
+}
+.hero-sub strong{color:var(--text);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* 进度环 */
+.ring-box{
+  display:flex;align-items:center;gap:26px;margin-top:44px;
+  opacity:0;animation:fadeUp 1s 1s forwards;
+}
+.ring-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
+.ring-wrap svg{transform:rotate(-90deg);filter:drop-shadow(0 0 12px rgba(232,176,75,.35));}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:8;}
+.ring-fg{
+  fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);
+}
+.ring-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.ring-num{font-size:30px;font-weight:800;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums;}
+.ring-label{font-size:11px;color:var(--faint);letter-spacing:2px;margin-top:5px;}
+.ring-info{font-size:14px;color:var(--dim);}
+.ring-info b{color:var(--text);font-size:17px;display:block;margin-bottom:4px;}
+.ring-info .cur-stage{color:var(--gold);font-weight:700;}
+
+.scroll-hint{
+  margin-top:auto;padding-top:40px;text-align:center;color:var(--faint);font-size:12px;letter-spacing:3px;
+  animation:bob 2.2s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.5;}50%{transform:translateY(8px);opacity:1;}}
+
+/* ---------- 顶部迷你进度条 ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(7,8,12,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--glass-line);
+  transform:translateY(-100%);transition:transform .45s cubic-bezier(.22,1,.36,1);
+}
+.topbar.show{transform:translateY(0);}
+.topbar-in{max-width:700px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:16px;}
+.topbar-title{font-size:13px;font-weight:700;letter-spacing:1px;white-space:nowrap;}
+.topbar-track{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+.topbar-fill{
+  height:100%;width:0%;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold-soft),var(--gold));
+  box-shadow:0 0 10px var(--gold-dim);
+  transition:width .8s cubic-bezier(.22,1,.36,1);
+}
+.topbar-pct{font-size:12px;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;width:38px;text-align:right;}
+
+/* ---------- 军规 ---------- */
+.rules{
+  border:1px solid var(--gold-dim);border-radius:18px;padding:26px 28px;margin:10px 0 30px;
+  background:linear-gradient(160deg,rgba(232,176,75,.08),rgba(232,176,75,.02));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  position:relative;overflow:hidden;
+}
+.rules::before{
+  content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(105deg,transparent,rgba(232,176,75,.07),transparent);
+  animation:sweep 5s ease-in-out infinite;
+}
+@keyframes sweep{0%,60%{left:-100%;}100%{left:160%;}}
+.rules h2{font-size:15px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;}
+.rules li{list-style:none;padding-left:30px;position:relative;margin-bottom:12px;font-size:15px;color:var(--dim);}
+.rules li em{color:var(--text);font-style:normal;font-weight:600;}
+.rules li:last-child{margin-bottom:0;}
+.rules li::before{content:attr(data-n);position:absolute;left:0;top:0;color:var(--gold);font-weight:800;}
+
+/* ---------- 时间线 ---------- */
+.timeline{position:relative;padding-left:34px;}
+.tl-track{position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:rgba(255,255,255,.08);border-radius:1px;}
+.tl-fill{
+  position:absolute;left:10px;top:8px;width:2px;height:0;border-radius:1px;
+  background:linear-gradient(180deg,var(--gold),var(--gold-soft));
+  box-shadow:0 0 10px var(--gold-dim);
+  transition:height 1.2s cubic-bezier(.22,1,.36,1);
+}
+
+/* ---------- 阶段 ---------- */
+.stage{margin-bottom:54px;position:relative;transition:opacity .6s,filter .6s;}
+.stage-node{
+  position:absolute;left:-34px;top:4px;width:22px;height:22px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--faint);
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint);
+  transition:all .5s;z-index:3;
+}
+.stage.active .stage-node{
+  border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 0 5px rgba(232,176,75,.12),0 0 16px rgba(232,176,75,.5);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(232,176,75,.10),0 0 12px rgba(232,176,75,.4);}50%{box-shadow:0 0 0 8px rgba(232,176,75,.05),0 0 22px rgba(232,176,75,.6);}}
+.stage.done-stage .stage-node{border-color:var(--green);background:var(--green);color:#07080c;font-weight:800;}
+.stage-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
+.stage-num{
+  font-size:12px;color:var(--gold);border:1px solid var(--gold-dim);border-radius:20px;
+  padding:3px 14px;letter-spacing:2px;white-space:nowrap;background:rgba(232,176,75,.06);
+}
+.stage-title{font-size:22px;font-weight:800;letter-spacing:1px;}
+.stage.done-stage .stage-title{color:var(--dim);}
+.stage-when{color:var(--faint);font-size:13px;margin-bottom:18px;letter-spacing:.5px;}
+
+.stage.locked{opacity:.38;filter:blur(1.5px) grayscale(.5);pointer-events:none;user-select:none;}
+.lock-banner{
+  display:none;align-items:center;gap:8px;font-size:13px;color:var(--faint);
+  margin-bottom:14px;letter-spacing:1px;
+}
+.stage.locked .lock-banner{display:flex;}
+.stage.unlocking{animation:unlockFx 1s cubic-bezier(.22,1,.36,1);}
+@keyframes unlockFx{
+  0%{opacity:.38;filter:blur(1.5px) grayscale(.5);transform:scale(.985);}
+  60%{opacity:1;filter:blur(0) grayscale(0);transform:scale(1.012);}
+  100%{opacity:1;filter:none;transform:scale(1);}
+}
+
+/* ---------- 任务卡 ---------- */
+.task{
+  background:var(--glass);
+  border:1px solid var(--glass-line);
+  border-radius:18px;
+  margin-bottom:16px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:border-color .35s,box-shadow .35s,background .35s,transform .35s;
+  overflow:hidden;position:relative;
+}
+.task:hover{
+  border-color:rgba(232,176,75,.4);
+  box-shadow:0 8px 32px rgba(0,0,0,.45),0 0 24px rgba(232,176,75,.07);
+  transform:translateY(-2px);
+}
+.task.checked{border-color:rgba(95,197,134,.5);background:rgba(95,197,134,.05);}
+.task.checked:hover{box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 24px rgba(95,197,134,.1);}
+
+.task-top{display:flex;gap:16px;align-items:center;cursor:pointer;user-select:none;padding:20px 22px;}
+.cbox{
+  flex-shrink:0;width:30px;height:30px;border-radius:10px;
+  border:2px solid var(--faint);position:relative;transition:all .3s;
+  display:flex;align-items:center;justify-content:center;
+}
+.task-top:hover .cbox{border-color:var(--gold);box-shadow:0 0 12px rgba(232,176,75,.3);}
+.cbox svg{width:16px;height:16px;}
+.cbox path{
+  stroke:#07080c;stroke-width:3.4;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s ease .1s;
+}
+.task.checked .cbox{border-color:var(--green);background:var(--green);box-shadow:0 0 16px rgba(95,197,134,.5);}
+.task.checked .cbox path{stroke-dashoffset:0;}
+.task-name{font-size:16.5px;font-weight:700;flex:1;transition:color .3s;}
+.task.checked .task-name{color:var(--faint);text-decoration:line-through;text-decoration-color:rgba(163,159,149,.5);}
+.chev{
+  flex-shrink:0;color:var(--faint);font-size:13px;transition:transform .4s cubic-bezier(.22,1,.36,1);
+  padding:6px;
+}
+.task.open .chev{transform:rotate(180deg);color:var(--gold);}
+
+.task-body-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.22,1,.36,1);}
+.task.open .task-body-wrap{grid-template-rows:1fr;}
+.task-body-in{overflow:hidden;}
+.task-body{padding:0 22px 22px 68px;font-size:14.5px;color:var(--dim);}
+.task-body p{margin-bottom:9px;}
+.task-body em{color:var(--text);font-style:normal;font-weight:600;}
+.why{
+  color:var(--faint);font-size:13px;margin-top:12px;padding:12px 14px;
+  border-left:2px solid var(--blue);background:rgba(111,168,220,.05);border-radius:0 10px 10px 0;
+}
+.why b{color:var(--blue);}
+.done-line{
+  color:var(--green);font-size:13.5px;margin-top:12px;padding:10px 14px;
+  background:rgba(95,197,134,.07);border-radius:10px;
+}
+.done-line::before{content:"✓ 完成标准 · ";font-weight:800;}
+.mark-btn{
+  margin-top:16px;display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--gold-dim);color:var(--gold);background:rgba(232,176,75,.07);
+  padding:9px 22px;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .25s;font-family:inherit;letter-spacing:1px;
+}
+.mark-btn:hover{background:rgba(232,176,75,.16);box-shadow:0 0 18px rgba(232,176,75,.25);transform:translateY(-1px);}
+.task.checked .mark-btn{border-color:rgba(95,197,134,.4);color:var(--green);background:rgba(95,197,134,.08);}
+
+/* ---------- 每周 / 红灯 ---------- */
+.panel{
+  border-radius:18px;padding:26px 28px;margin-top:26px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.weekly{border:1px solid rgba(111,168,220,.4);background:linear-gradient(160deg,rgba(111,168,220,.08),rgba(111,168,220,.02));}
+.weekly h2{font-size:18px;color:var(--blue);margin-bottom:4px;}
+.weekly .when{color:var(--faint);font-size:13px;margin-bottom:14px;}
+.weekly ol{padding-left:22px;}
+.weekly li{margin-bottom:9px;font-size:15px;color:var(--dim);}
+.weekly li b{color:var(--text);}
+.weekly .note{color:var(--faint);font-size:13px;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.12);}
+
+.redflags{border:1px solid rgba(224,112,95,.4);background:linear-gradient(160deg,rgba(224,112,95,.07),rgba(224,112,95,.02));}
+.redflags h2{font-size:18px;color:var(--red);margin-bottom:4px;}
+.redflags .sub2{color:var(--faint);font-size:13px;margin-bottom:16px;}
+.redflags li{list-style:none;padding-left:28px;position:relative;margin-bottom:11px;font-size:15px;color:var(--dim);}
+.redflags li::before{content:"⛔";position:absolute;left:0;font-size:13px;top:2px;}
+.redflags li em{color:var(--text);font-style:normal;}
+
+/* ---------- 完成庆祝 ---------- */
+.finale{
+  display:none;text-align:center;margin-top:60px;padding:50px 30px;
+  border:1px solid var(--gold-dim);border-radius:22px;
+  background:radial-gradient(circle at 50% 0%,rgba(232,176,75,.14),transparent 70%);
+}
+.finale.show{display:block;animation:fadeUp .9s;}
+.finale .big{font-size:44px;margin-bottom:14px;}
+.finale h2{font-size:24px;color:var(--gold);margin-bottom:10px;letter-spacing:2px;}
+.finale p{color:var(--dim);font-size:15px;max-width:420px;margin:0 auto;}
+
+footer{margin-top:70px;text-align:center;color:var(--faint);font-size:13px;line-height:2.2;}
+footer .quote{color:var(--dim);font-size:15px;font-style:italic;}
+
+/* 滚动进场 */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);}
+.reveal.vis{opacity:1;transform:translateY(0);}
+.stage.locked.reveal{opacity:.38;}
+
+@media (max-width:520px){
+  .task-body{padding-left:22px;}
+  .ring-box{gap:18px;}
+  .ring-wrap{width:110px;height:110px;}
+  .stage-title{font-size:19px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="confetti"></canvas>
+
+<!-- 顶部迷你进度 -->
+<div class="topbar" id="topbar">
+  <div class="topbar-in">
+    <span class="topbar-title">改变执行表</span>
+    <div class="topbar-track"><div class="topbar-fill" id="topbarFill"></div></div>
+    <span class="topbar-pct" id="topbarPct">0%</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="kicker">执 行 顺 序 表</div>
+  <h1>一次只改<br>一件事</h1>
+  <p class="hero-sub">这不是一个新系统。这是一张<strong>顺序表</strong>：上面的没打勾，下面的锁着不用看。你唯一要维护的，就是做完一件事回来打一个勾。</p>
+  <div class="ring-box">
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c9963d"/><stop offset="100%" stop-color="#f5cd7e"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="65" cy="65" r="56"/>
+        <circle class="ring-fg" id="ringFg" cx="65" cy="65" r="56"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-num" id="ringNum">0%</div>
+        <div class="ring-label">总进度</div>
+      </div>
+    </div>
+    <div class="ring-info">
+      <b id="doneText">0 / 11 已完成</b>
+      当前解锁到：<span class="cur-stage" id="curStage">阶段 0</span><br>
+      勾选进度自动保存在本机
+    </div>
+  </div>
+  <div class="scroll-hint">↓ 往下滑，从阶段 0 开始</div>
+</section>
+
+<!-- 军规 -->
+<div class="rules reveal">
+  <h2>三条军规 · 贯穿全程</h2>
+  <li data-n="一">30 天内<em>不建任何新系统</em>、新流水线、新智能体。冒出「等我先把 XX 搭好」的念头 = 第 6 号回路发作，直接掐掉。</li>
+  <li data-n="二">一次只推进<em>一个</em>「当前任务」，做完打勾才解锁下一个。</li>
+  <li data-n="三">所有记录用手机备忘录打勾，<em>禁止</em>为这张表再建任何追踪工具。</li>
+</div>
+
+<!-- 时间线 -->
+<div class="timeline">
+  <div class="tl-track"></div>
+  <div class="tl-fill" id="tlFill"></div>
+
+  <!-- 阶段 0 -->
+  <section class="stage reveal" data-stage="0">
+    <div class="stage-node">0</div>
+    <div class="stage-head"><span class="stage-num">阶段 0</span><span class="stage-title">今天 · 10 分钟</span></div>
+    <div class="stage-when">现在，读完这页之后立刻做</div>
+    <div class="lock-banner">🔒 先完成上一阶段</div>
+
+    <div class="task" data-id="t01">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">签冻结令：30 天不建新系统</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>在手机备忘录置顶写一行：<em>「2026-08-06 之前，不建任何新系统。想建 = 逃避。」</em>写完就算签了。</p>
+        <div class="why"><b>对应发现 ①</b>　建系统已经成了你「感觉在努力」的新形态。先把这条路堵死，后面的才有可能发生。</div>
+        <div class="done-line">备忘录里有这一行，且置顶。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+
+    <div class="task" data-id="t02">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">定一条约会硬规则</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>两句话写进同一条备忘录：<em>「任何人，见面 3–5 次必须决策：推进或退出，不许拖。」「第一次约会人均 ≤ 150，不喝酒。」</em></p>
+        <p>这两条你自己早就写过，今天只是把它从笔记升级成规则。</p>
+        <div class="why"><b>对应发现 ②</b>　优柔寡断每个月在账本上有价格——4 月社交餐饮 4956 元。这条规则同时管感情效率和钱包。</div>
+        <div class="done-line">两句话写进备忘录。对「条件女孩」立即生效：第 2、3 次见面验证排斥感有没有下降，第 5 次前必须给结论。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+  </section>
+
+  <!-- 阶段 1 -->
+  <section class="stage reveal" data-stage="1">
+    <div class="stage-node">1</div>
+    <div class="stage-head"><span class="stage-num">阶段 1</span><span class="stage-title">本周 · 身体先动</span></div>
+    <div class="stage-when">第 1–7 天</div>
+    <div class="lock-banner">🔒 先完成阶段 0</div>
+
+    <div class="task" data-id="t11">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">健身房微互动 × 3 次</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>你 6 月 15 日就写好了渐进计划，现在执行第一档：本周去健身房 3 次，每次完成 <em>1 个微互动</em>——眼神对上点个头、器械交接说一句「你还有几组？」。就这么小。不要求聊天，不要求要联系方式，不要求对象是女生。</p>
+        <p><em>感到不舒服是正确信号</em>，说明剂量到了。</p>
+        <div class="why"><b>对应发现 ⑤</b>　这是你自己 OCD 缓解清单里写的「做短期痛苦、长期轻松的事」。一个动作两个疗程：既是搭讪脱敏，又是焦虑暴露练习。全表最便宜的杠杆。</div>
+        <div class="done-line">本周 3 次，备忘录打 3 个勾。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+
+    <div class="task" data-id="t12">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">周日晚：20 分钟补 7 月复盘（只写 3 行）</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>打开 Notion 的 7 月复盘页，<em>只填第 4 栏「个人反思」，只写 3 行</em>，不许美化模板、不许加新字段：</p>
+        <p>① 这个月最大的一笔浪费是什么　② 社交餐饮花了多少　③ 下个月砍掉哪一项</p>
+        <div class="why"><b>对应发现 ① + ②</b>　你 5 月做到过（吃饭从 9078 降到 5608、储蓄 2317），然后闭环断了。3 行就够把闭环接回来——复盘的价值在「有」，不在「精致」。</div>
+        <div class="done-line">7 月页面第 4 栏有 3 行字。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+  </section>
+
+  <!-- 阶段 2 -->
+  <section class="stage reveal" data-stage="2">
+    <div class="stage-node">2</div>
+    <div class="stage-head"><span class="stage-num">阶段 2</span><span class="stage-title">第 2 周 · 动根</span></div>
+    <div class="stage-when">第 8–14 天 · 挑一个安静的晚上，一次 60–90 分钟</div>
+    <div class="lock-banner">🔒 先完成阶段 1</div>
+
+    <div class="task" data-id="t21">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">给「欺骗父母」建第一条决策记录</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>打开决策顾问（Raycast「决策顾问」），对它说：<em>「帮我决策：关于我一直瞒着父母的事，要不要坦白、怎么坦白、什么时候坦白。」</em>让它按流程问你，你如实答。</p>
+        <p>今晚的目标<em>不是坦白</em>，是让这件事从「0 个文件」变成「1 个文件」——有成本收益分析、有最坏结果评估、有路径选项。仅此而已。</p>
+        <div class="why"><b>对应发现 ③</b>　这是你烦恼清单排第一、却唯一零基础设施的问题。它很可能是纯强迫「我是坏人」怀疑的上游燃料——每天的隐瞒都在给强迫思维供货。杠杆率比其他所有系统加起来都高。</div>
+        <div class="done-line">决策系统/决策记录/ 里多了一个文件。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+
+    <div class="task" data-id="t22">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">删掉一个你不再用的系统</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>从这几个里挑一个明确不再用的，归档或删掉：mempalace（5 月 9 日后没碰过）／空着的 Obsidian「搞哲学」文件夹／任何一个三十天没跑过的自动化。</p>
+        <div class="why"><b>对应发现 ① + ④</b>　你的库一直在投票「少自省、多留白」。做减法是向自己证明：系统是工具，不是收藏品。删的时候如果舍不得——那个「舍不得」就是第 6 号回路的心跳。</div>
+        <div class="done-line">少了一个系统，且世界没有塌。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+  </section>
+
+  <!-- 阶段 3 -->
+  <section class="stage reveal" data-stage="3">
+    <div class="stage-node">3</div>
+    <div class="stage-head"><span class="stage-num">阶段 3</span><span class="stage-title">第 3–4 周 · 换赛道输出</span></div>
+    <div class="stage-when">第 15–28 天</div>
+    <div class="lock-banner">🔒 先完成阶段 2</div>
+
+    <div class="task" data-id="t31">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">发出第一篇「用 AI 管理人生」的内容</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>不做健康科普了，先发一篇你真正有素材优势的：<em>「我用 AI 给自己建了一个恋爱决策系统」</em>或<em>「我让 AI 审计了我的账本，发现 91% 的收入被吃掉了」</em>。素材是现成的，截图 + 真实故事，一晚上能出。</p>
+        <p>发在哪都行（小红书或 X），<em>标准只有一个：发出去</em>。数据好坏不重要，重要的是打破「只研究不发布」。</p>
+        <div class="why"><b>对应发现 ⑥</b>　你的稀缺技能是「用 AI 系统化地运营人生」，不是泛健康知识。这个题材供给稀缺、你有真素材，而且每一次自我改造本身就是下一篇内容。</div>
+        <div class="done-line">有一篇带真实截图的内容处于「已发布」状态。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+
+    <div class="task" data-id="t32">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">搭讪升级：从点头到一次真实对话</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>微互动满两周后升级：本周完成 <em>1 次超过三句话的真实对话</em>（健身房、咖啡店、活动都行）。<em>被拒绝也算完成</em>——你要的是次数，不是结果。</p>
+        <div class="why"><b>对应发现 ⑤</b>　按你自己写的漏斗，你卡在「曝光 → 互动」这一层。互动次数上去了，下面每一层自然有流量。</div>
+        <div class="done-line">1 次三句话以上的对话（成败不论）。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+  </section>
+
+  <!-- 阶段 4 -->
+  <section class="stage reveal" data-stage="4">
+    <div class="stage-node">4</div>
+    <div class="stage-head"><span class="stage-num">阶段 4</span><span class="stage-title">第 30 天 · 复检</span></div>
+    <div class="stage-when">2026-08-06 前后</div>
+    <div class="lock-banner">🔒 先完成阶段 3</div>
+
+    <div class="task" data-id="t41">
+      <div class="task-top"><div class="cbox"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></div><div class="task-name">回到 Claude，念这句话</div><div class="chev">▼</div></div>
+      <div class="task-body-wrap"><div class="task-body-in"><div class="task-body">
+        <p>对 Claude 说：<em>「对照改变执行表，帮我复检这 30 天：账本、搭讪次数、决策记录、发布内容，哪些做到了哪些没有。」</em>让 AI 用数据说话，你只负责听真话。</p>
+        <p>做到了 → 解冻系统建设权限，下一轮升级难度。没做到 → 不批评，把没做到的那一件变成新的「当前任务」，重来。</p>
+        <div class="done-line">复检完成，知道下一步。</div>
+        <button class="mark-btn">标记完成</button>
+      </div></div></div>
+    </div>
+  </section>
+</div><!-- /timeline -->
+
+<!-- 完成庆祝 -->
+<div class="finale" id="finale">
+  <div class="big">🏆</div>
+  <h2>30 天，11 件事，全部完成</h2>
+  <p>你用行动证明了：你缺的从来不是系统，是闭环。现在回到 Claude 做复检，然后解锁下一轮。</p>
+</div>
+
+<!-- 每周检查点 -->
+<div class="panel weekly reveal">
+  <h2>每周日晚 · 唯一保留的仪式</h2>
+  <div class="when">20 分钟封顶 · 只回答三个问题，答完关掉，不许延长</div>
+  <ol>
+    <li>这周<b>产出</b>了什么？（发出的东西、打的勾，研究不算）</li>
+    <li>微互动 / 搭讪几次？</li>
+    <li>有没有偷偷开始建新系统？</li>
+  </ol>
+  <p class="note">你收藏过：「每周至少一天不做应该做的事。」——周日答完这三个问题，剩下的时间就是那一天。不要复盘细节，不要写长文。你的 OCD 加重清单第 5 条是「反复检查」，复盘过度就是检查的变体。</p>
+</div>
+
+<!-- 红灯清单 -->
+<div class="panel redflags reveal">
+  <h2>红灯清单</h2>
+  <p class="sub2">出现以下任何一条，说明你又跑偏了——立刻回到当前任务</p>
+  <li>开始研究新的笔记工具 / 自动化 / 提示词技巧，<em>而当前任务还没打勾</em></li>
+  <li>想给这张表加功能、做统计、接数据库</li>
+  <li>连续两周「三个问题」的第一题答不出任何产出</li>
+  <li>对某个女生的判断拖过了第 5 次见面还没有结论</li>
+  <li>深夜又开始反复推演「我是不是坏人」——那是强迫思维在冒充思考，按你验证过的方法：觉察、贴标签、不参与</li>
+</div>
+
+<footer>
+  <p class="quote">「真正改变一个人生活轨迹的，几乎从来都是范式的转变。」</p>
+  <p>—— 你自己高亮过的这句话</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  /* ========== 星空背景 ========== */
+  var sc=document.getElementById('stars'),sx=sc.getContext('2d'),stars=[],W,H;
+  function sizeStars(){
+    W=sc.width=innerWidth*devicePixelRatio;H=sc.height=innerHeight*devicePixelRatio;
+    sc.style.width=innerWidth+'px';sc.style.height=innerHeight+'px';
+    stars=[];
+    var n=Math.min(110,Math.floor(innerWidth/12));
+    for(var i=0;i<n;i++)stars.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:(Math.random()*1.3+.4)*devicePixelRatio,
+      p:Math.random()*Math.PI*2,s:.008+Math.random()*.02,
+      vy:(.02+Math.random()*.06)*devicePixelRatio
+    });
+  }
+  sizeStars();addEventListener('resize',sizeStars);
+  (function loopStars(){
+    sx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){var st=stars[i];
+      st.p+=st.s;st.y-=st.vy;if(st.y<-4)st.y=H+4;
+      var a=.25+Math.sin(st.p)*.25;
+      sx.beginPath();sx.arc(st.x,st.y,st.r,0,7);
+      sx.fillStyle='rgba(232,200,140,'+a.toFixed(3)+')';sx.fill();
+    }
+    requestAnimationFrame(loopStars);
+  })();
+
+  /* ========== 彩带粒子 ========== */
+  var cc=document.getElementById('confetti'),cx=cc.getContext('2d'),parts=[];
+  function sizeConf(){cc.width=innerWidth*devicePixelRatio;cc.height=innerHeight*devicePixelRatio;
+    cc.style.width=innerWidth+'px';cc.style.height=innerHeight+'px';}
+  sizeConf();addEventListener('resize',sizeConf);
+  var COLORS=['#e8b04b','#f5cd7e','#5fc586','#6fa8dc','#f0ede6','#e0705f'];
+  function burst(x,y,n){
+    for(var i=0;i<n;i++){
+      var a=Math.random()*Math.PI*2,v=(2+Math.random()*7)*devicePixelRatio;
+      parts.push({x:x*devicePixelRatio,y:y*devicePixelRatio,
+        vx:Math.cos(a)*v,vy:Math.sin(a)*v-3*devicePixelRatio,
+        g:.22*devicePixelRatio,life:1,decay:.012+Math.random()*.015,
+        size:(3+Math.random()*5)*devicePixelRatio,
+        c:COLORS[Math.floor(Math.random()*COLORS.length)],
+        rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.3});
+    }
+  }
+  (function loopConf(){
+    cx.clearRect(0,0,cc.width,cc.height);
+    for(var i=parts.length-1;i>=0;i--){var p=parts[i];
+      p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.985;p.life-=p.decay;p.rot+=p.vr;
+      if(p.life<=0){parts.splice(i,1);continue;}
+      cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.rot);
+      cx.fillStyle=p.c;cx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.62);cx.restore();
+    }
+    requestAnimationFrame(loopConf);
+  })();
+
+  /* ========== 状态 ========== */
+  var KEY='change-plan-v1',state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){state={};}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+  var tasks=[].slice.call(document.querySelectorAll('.task'));
+  var stagesEls=[].slice.call(document.querySelectorAll('.stage'));
+  var R=56,CIRC=2*Math.PI*R;
+  var ringFg=document.getElementById('ringFg');
+  ringFg.style.strokeDasharray=CIRC;ringFg.style.strokeDashoffset=CIRC;
+
+  function stageTasks(s){return [].slice.call(s.querySelectorAll('.task'));}
+  function stageDone(s){return stageTasks(s).every(function(t){return state[t.dataset.id];});}
+
+  var prevLocked={};
+  var displayedPct=0,targetPct=0,rafNum=null;
+  function animateNum(){
+    var el=document.getElementById('ringNum');
+    if(Math.abs(displayedPct-targetPct)<.6){displayedPct=targetPct;el.textContent=Math.round(displayedPct)+'%';rafNum=null;return;}
+    displayedPct+=(targetPct-displayedPct)*.12;
+    el.textContent=Math.round(displayedPct)+'%';
+    rafNum=requestAnimationFrame(animateNum);
+  }
+
+  function render(initial){
+    var done=0;
+    tasks.forEach(function(t){if(state[t.dataset.id]){t.classList.add('checked');done++;}else{t.classList.remove('checked');}});
+    tasks.forEach(function(t){
+      var btn=t.querySelector('.mark-btn');
+      btn.textContent=state[t.dataset.id]?'↺ 取消标记':'标记完成';
+    });
+
+    var prevDone=true,curName='阶段 0',allDone=true,doneStages=0;
+    stagesEls.forEach(function(s){
+      var locked=!prevDone;
+      var wasLocked=prevLocked[s.dataset.stage];
+      s.classList.toggle('locked',locked);
+      if(wasLocked&&!locked&&!initial){
+        s.classList.add('unlocking');
+        setTimeout(function(){s.classList.remove('unlocking');},1100);
+        var r=s.getBoundingClientRect();
+        burst(r.left+40,Math.max(80,r.top+30),50);
+      }
+      prevLocked[s.dataset.stage]=locked;
+      var sd=stageDone(s);
+      s.classList.toggle('done-stage',sd&&!locked);
+      s.classList.toggle('active',!locked&&!sd);
+      if(!locked&&!sd&&curName==='阶段 0'||(!locked&&!sd&&allDone)){curName='阶段 '+s.dataset.stage;}
+      if(sd&&!locked)doneStages++;
+      if(!sd)allDone=false;
+      prevDone=prevDone&&sd;
+      var node=s.querySelector('.stage-node');
+      node.textContent=(sd&&!locked)?'✓':s.dataset.stage;
+    });
+    if(allDone)curName='全部完成 🎉';
+
+    var pct=tasks.length?done/tasks.length*100:0;
+    targetPct=pct;
+    if(!rafNum)rafNum=requestAnimationFrame(animateNum);
+    ringFg.style.strokeDashoffset=CIRC*(1-pct/100);
+    document.getElementById('doneText').textContent=done+' / '+tasks.length+' 已完成';
+    document.getElementById('curStage').textContent=curName;
+    document.getElementById('topbarFill').style.width=pct+'%';
+    document.getElementById('topbarPct').textContent=Math.round(pct)+'%';
+    document.getElementById('tlFill').style.height=(doneStages/stagesEls.length*100)+'%';
+
+    var fin=document.getElementById('finale');
+    if(allDone&&!fin.classList.contains('show')){
+      fin.classList.add('show');
+      if(!initial){
+        var i=0,iv=setInterval(function(){
+          burst(innerWidth*Math.random(),innerHeight*.25*Math.random()+60,60);
+          if(++i>5)clearInterval(iv);
+        },260);
+        fin.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }else if(!allDone){fin.classList.remove('show');}
+  }
+
+  /* 交互：卡片头 = 展开/收起；按钮 = 打勾 */
+  tasks.forEach(function(t){
+    t.querySelector('.task-top').addEventListener('click',function(){
+      if(t.closest('.stage').classList.contains('locked'))return;
+      t.classList.toggle('open');
+    });
+    t.querySelector('.mark-btn').addEventListener('click',function(e){
+      e.stopPropagation();
+      if(t.closest('.stage').classList.contains('locked'))return;
+      var id=t.dataset.id,turningOn=!state[id];
+      state[id]=turningOn;save();
+      if(turningOn){
+        var box=t.querySelector('.cbox').getBoundingClientRect();
+        burst(box.left+box.width/2,box.top+box.height/2,36);
+        t.classList.remove('open');
+      }
+      render(false);
+    });
+  });
+
+  /* 默认展开：当前阶段第一个未完成任务 */
+  (function autoOpen(){
+    for(var i=0;i<stagesEls.length;i++){
+      var s=stagesEls[i];
+      var ts=stageTasks(s);
+      for(var j=0;j<ts.length;j++){
+        if(!state[ts[j].dataset.id]){ts[j].classList.add('open');return;}
+      }
+    }
+  })();
+
+  /* 初始化锁状态记录（避免加载时放烟花） */
+  (function initLocks(){
+    var prevDone=true;
+    stagesEls.forEach(function(s){prevLocked[s.dataset.stage]=!prevDone;prevDone=prevDone&&stageDone(s);});
+  })();
+  render(true);
+
+  /* 顶栏出现 */
+  var hero=document.querySelector('.hero');
+  addEventListener('scroll',function(){
+    document.getElementById('topbar').classList.toggle('show',scrollY>hero.offsetHeight*.7);
+  },{passive:true});
+
+  /* 滚动进场 */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});
+  },{threshold:.08});
+  [].slice.call(document.querySelectorAll('.reveal')).forEach(function(el){io.observe(el);});
+})();
+</script>
+</body>
+</html>
