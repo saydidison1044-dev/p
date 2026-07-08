@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的自动化功能对照表</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --ink: #1c1b18;
+    --sub: #6f6a5f;
+    --line: #e5e1d6;
+    --accent: #b4531f;
+    --kbd-bg: #efece3;
+    --kbd-line: #d8d3c4;
+    --tag-auto: #2e7d4f;
+    --tag-auto-bg: #e4f2ea;
+    --shadow: 0 1px 3px rgba(30,25,15,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16150f;
+      --card: #201e17;
+      --ink: #ece8dd;
+      --sub: #9d978a;
+      --line: #35322a;
+      --accent: #e8a061;
+      --kbd-bg: #2b2820;
+      --kbd-line: #454136;
+      --tag-auto: #7bd4a3;
+      --tag-auto-bg: #1d3328;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+    line-height: 1.6; padding: 28px 16px 60px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  header h1 { font-size: 26px; letter-spacing: .5px; }
+  header p.sub { color: var(--sub); font-size: 14px; margin-top: 6px; }
+  .search {
+    margin: 20px 0 8px; position: sticky; top: 10px; z-index: 5;
+  }
+  .search input {
+    width: 100%; padding: 12px 16px; font-size: 16px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    background: var(--card); color: var(--ink); outline: none;
+    box-shadow: var(--shadow);
+  }
+  .search input:focus { border-color: var(--accent); }
+  nav.toc { display:flex; flex-wrap:wrap; gap:8px; margin: 14px 0 6px; }
+  nav.toc a {
+    font-size: 13px; color: var(--accent); text-decoration: none;
+    border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px;
+    background: var(--card);
+  }
+  section { margin-top: 34px; }
+  section h2 {
+    font-size: 15px; color: var(--sub); font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 4px;
+  }
+  section h2 .cn { color: var(--ink); font-size: 18px; letter-spacing: 1px; }
+  .hint { font-size: 13px; color: var(--sub); margin: 8px 0 12px; }
+  .item {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 13px 16px; margin-bottom: 10px; box-shadow: var(--shadow);
+  }
+  .item .row1 { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .item .name { font-weight: 650; font-size: 15.5px; }
+  .item .desc { color: var(--sub); font-size: 14px; margin-top: 4px; }
+  .item .how { font-size: 12.5px; color: var(--accent); margin-top: 6px; }
+  kbd {
+    display:inline-block; padding: 2px 9px; font-size: 13.5px; font-weight:600;
+    font-family: -apple-system, "SF Pro", "PingFang SC", sans-serif;
+    background: var(--kbd-bg); border: 1px solid var(--kbd-line);
+    border-bottom-width: 2.5px; border-radius: 7px; white-space: nowrap;
+  }
+  .tag {
+    font-size: 11.5px; padding: 2px 8px; border-radius: 10px;
+    background: var(--tag-auto-bg); color: var(--tag-auto); font-weight: 600;
+    white-space: nowrap;
+  }
+  .tag.off { background: var(--kbd-bg); color: var(--sub); }
+  .empty { display:none; text-align:center; color: var(--sub); padding: 40px 0; }
+  footer { margin-top: 44px; font-size: 12.5px; color: var(--sub); border-top: 1px solid var(--line); padding-top: 14px; }
+  footer p { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>我的自动化功能对照表</h1>
+    <p class="sub">这台 Mac 上所有快捷键、Raycast 命令、自动任务的说明书 · 忘了就来查 · 2026-07-08 生成</p>
+  </header>
+
+  <div class="search"><input id="q" type="search" placeholder="搜功能名或关键词，比如：小红书 / 滚动 / 周报 / Spotify…"></div>
+
+  <nav class="toc">
+    <a href="#kb">⌨️ 键盘快捷键</a>
+    <a href="#pipe">🏭 内容生产线</a>
+    <a href="#mode">🎛 模式开关</a>
+    <a href="#tools">🧰 小工具</a>
+    <a href="#auto">⏰ 自动定时任务</a>
+    <a href="#daemon">🌙 后台守护</a>
+  </nav>
+
+  <!-- ══════════ 键盘快捷键 ══════════ -->
+  <section id="kb">
+    <h2><span class="cn">键盘快捷键</span> · Hammerspoon 常驻，开机自动生效</h2>
+
+    <div class="item"><div class="row1"><kbd>↑</kbd><kbd>↓</kbd><span class="name">上下键变滚动</span></div>
+      <div class="desc">在浏览器和阅读类 App 里，上下方向键直接滚动页面，手不用碰触控板。生效范围：Safari / Chrome / Arc / Edge / Firefox / Brave / 预览(PDF) / 图书 / Claude / NotebookLM / ChatGPT / Gemini / Perplexity。写字记笔记的 App 不受影响，上下键照常移动光标。</div></div>
+
+    <div class="item"><div class="row1"><kbd>⌘ ←</kbd><kbd>⌘ →</kbd><span class="name">左右切换窗口</span></div>
+      <div class="desc">在当前所有打开的窗口之间切换，按屏幕上左右位置排序，比 ⌘Tab 更直观。</div></div>
+
+    <div class="item"><div class="row1"><kbd>⇧⌘C</kbd><span class="name">窗口居中</span></div>
+      <div class="desc">当前窗口调成正常尺寸并居中；再按一次恢复到原来的大小和位置。（Chrome 和 Infuse 打开时会自动居中，不用手动按。）</div></div>
+
+    <div class="item"><div class="row1"><kbd>⌥ S</kbd><span class="name">Session 计时器 显示/隐藏</span></div>
+      <div class="desc">开关 Session 番茄钟窗口，按一次显示、再按隐藏。</div></div>
+
+    <div class="item"><div class="row1"><kbd>⌥ P</kbd><span class="name">Spotify 播放 / 暂停</span></div>
+      <div class="desc">全局播放/暂停 Spotify，不弹出窗口打断你。</div></div>
+
+    <div class="item"><div class="row1"><kbd>⌃⌥ S</kbd><span class="name">剪贴板存进 Reader</span></div>
+      <div class="desc">复制任何文字或链接后按这个键，直接存进 Readwise Reader 收件箱。（这是 Raycast 热键，对应「存到 Reader」命令。）</div></div>
+
+    <div class="item"><div class="row1"><kbd> \ </kbd><span class="name">反斜杠键 = Esc</span></div>
+      <div class="desc">键盘上的「\」键被映射成 Escape，弥补物理键位。</div></div>
+  </section>
+
+  <!-- ══════════ 内容生产线 ══════════ -->
+  <section id="pipe">
+    <h2><span class="cn">内容生产线</span> · Raycast 里搜名字回车即用</h2>
+    <p class="hint">共同点：打开一个已配置好的 Claude Code 窗口，素材丢进去，成品出来，中间不用管。</p>
+
+    <div class="item"><div class="row1"><span class="name">小红书创作</span></div>
+      <div class="desc">丢健康类干货素材，自动产出封面图 + 卡片图 + 正文文案，直接可发小红书。</div>
+      <div class="how">Raycast 搜「小红书创作」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">X推文创作</span></div>
+      <div class="desc">丢一句感悟 / 观点 / 粗想法，自动加工成 2-3 个版本的可发布推文（纯文字，不出图）。</div>
+      <div class="how">Raycast 搜「X推文创作」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">决策顾问</span></div>
+      <div class="desc">纠结的事（尤其恋爱相关）丢给它：信息不够它先提问，问够了给带明确结论的决策方案，自动记档案。</div>
+      <div class="how">Raycast 搜「决策顾问」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">Reader 助手</span></div>
+      <div class="desc">你的 Readwise Reader 阅读库接了 AI：搜索、综合回答、分类、打标签、整理，能答也能直接动手改。</div>
+      <div class="how">Raycast 搜「Reader 助手」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">读书报告</span></div>
+      <div class="desc">读完一本书输入书名，自动生成六模块读书报告（含联网查外部评价），投进 Reader 收件箱存档。</div>
+      <div class="how">Raycast 搜「读书报告」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">笔记库</span></div>
+      <div class="desc">在 Obsidian 笔记库（MyNotes）里打开 Claude Code，帮你记录、整理、归类、复盘笔记。</div>
+      <div class="how">Raycast 搜「笔记库」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">书籍提问</span></div>
+      <div class="desc">弹出固定顺序的读书提问模块清单，上下键选一条自动复制，粘贴到 NotebookLM 里问书用。</div>
+      <div class="how">Raycast 搜「书籍提问」</div></div>
+  </section>
+
+  <!-- ══════════ 模式开关 ══════════ -->
+  <section id="mode">
+    <h2><span class="cn">模式开关</span> · 一键布置 / 收起工作环境</h2>
+
+    <div class="item"><div class="row1"><span class="name">学习模式开关</span></div>
+      <div class="desc">一键三分屏：左 Claude / 中 NotebookLM / 右 Gemini，无缝铺满屏幕；已开着时再按一次就全部收起。</div>
+      <div class="how">Raycast 搜「学习模式」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">打开 Gemini 和 ChatGPT</span></div>
+      <div class="desc">点一次同时打开 Gemini 和 ChatGPT 窗口，再点一次全部关闭。</div>
+      <div class="how">Raycast 搜「打开 Gemini」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">专注当前窗口</span></div>
+      <div class="desc">开关式：按一次隐藏其他所有窗口、当前窗口居中放大；再按一次还原。</div>
+      <div class="how">Raycast 搜「专注」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">关闭模式 / 休息模式</span></div>
+      <div class="desc">退出 Dock 底栏里的普通应用，保留微信、v2rayN、Codex、Raycast、Finder 等常驻件。两个命令效果相同。</div>
+      <div class="how">Raycast 搜「关闭模式」或「休息模式」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">清空 Dock 运行应用</span></div>
+      <div class="desc">只退出 Dock 底栏的普通应用，不碰菜单栏和后台工具。（比上面两个更彻底，不留白名单。）</div>
+      <div class="how">Raycast 搜「清空 Dock」</div></div>
+  </section>
+
+  <!-- ══════════ 小工具 ══════════ -->
+  <section id="tools">
+    <h2><span class="cn">小工具</span> · 单点功能，用完即走</h2>
+
+    <div class="item"><div class="row1"><span class="name">存到 Reader</span><kbd>⌃⌥ S</kbd></div>
+      <div class="desc">把剪贴板里的文字 / 链接一键存进 Readwise Reader。</div>
+      <div class="how">按快捷键，或 Raycast 搜「存到 Reader」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">发剪贴板到 iPhone</span></div>
+      <div class="desc">抓当前剪贴板，通过 LocalSend 局域网直接推到 iPhone，不用开 AirDrop。</div>
+      <div class="how">Raycast 搜「发剪贴板」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">AI HTML网页</span></div>
+      <div class="desc">列出「Downloads/AI HTML网页」里 Claude 做过的所有网页，选一个用 Chrome 打开。<b>这份对照表本身也存在那里。</b></div>
+      <div class="how">Raycast 搜「AI HTML」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">🔋 充电提醒（键盘+鼠标）</span></div>
+      <div class="desc">立刻弹一条提醒，顺手给 Brydge 键盘和 MX Anywhere 鼠标充电。（后台每周一/周四上午 10 点也会自动弹，见下方后台守护。）</div>
+      <div class="how">Raycast 搜「充电提醒」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">搜书 SingleLogin</span></div>
+      <div class="desc">输入书名直接打开 SingleLogin 的搜索结果页，找电子书。</div>
+      <div class="how">Raycast 搜「搜书」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">搜视频</span></div>
+      <div class="desc">打开常用影视搜索网站首页。</div>
+      <div class="how">Raycast 搜「搜视频」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">YouTube</span></div>
+      <div class="desc">用 Chrome 打开 YouTube。</div>
+      <div class="how">Raycast 搜「YouTube」</div></div>
+
+    <div class="item"><div class="row1"><span class="name">Spotify 下一首 / 播放暂停</span></div>
+      <div class="desc">「Spotify Next Track」快速切下一首；「Spotify Play/Pause Hidden」播放暂停且不弹窗口（同 ⌥P 快捷键）。</div>
+      <div class="how">Raycast 搜「Spotify」</div></div>
+  </section>
+
+  <!-- ══════════ 自动定时任务 ══════════ -->
+  <section id="auto">
+    <h2><span class="cn">自动定时任务</span> · Claude 定时跑，你什么都不用做</h2>
+    <p class="hint">这些会自己运行。列在这里只是让你知道「那件事是它干的」。</p>
+
+    <div class="item"><div class="row1"><span class="name">Reader 每日打标</span><span class="tag">每天 23:00</span></div>
+      <div class="desc">自动把当天新存进 Reader 的内容改成清晰标题、打上中文场景标签（搞钱变现 / 健康精力 / 认知升级…八选二）。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">文件自动归类</span><span class="tag">每周日 19:00</span></div>
+      <div class="desc">把 Downloads / 桌面 / 文稿顶层散落的文件自动归进分类文件夹。只移动、绝不删除，日志留在 .file_organizer_logs。<b>找不到文件时先来这查日志。</b></div></div>
+
+    <div class="item"><div class="row1"><span class="name">Reader 周报</span><span class="tag">每周日 20:00</span></div>
+      <div class="desc">把本周存入 Reader 的内容写成中文周报投进收件箱，开头附一行「自动化体检」——检查以上这些自动任务是否都还活着。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">Drafts 每日摘要</span><span class="tag off">已停用</span></div>
+      <div class="desc">曾经每天 23 点汇总 Drafts，现已关闭，不会运行。</div></div>
+  </section>
+
+  <!-- ══════════ 后台守护 ══════════ -->
+  <section id="daemon">
+    <h2><span class="cn">后台守护</span> · launchd 系统级常驻，开机即活</h2>
+
+    <div class="item"><div class="row1"><span class="name">键鼠充电提醒</span><span class="tag">每周一 / 周四 10:00</span></div>
+      <div class="desc">蓝牙键鼠电量读不到，定时弹系统通知提醒充电兜底。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">NAS 影视入库确认</span><span class="tag">每 3 分钟</span></div>
+      <div class="desc">监控夸克下载到 NAS 的影视文件，下载完弹窗让你确认片名，然后自动改成 Infuse 认得的格式入库。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">夸克下载监控</span><span class="tag">常驻</span></div>
+      <div class="desc">盯着夸克网盘的下载任务，配合上面的入库确认使用。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">Dock 闲置应用自动退出</span><span class="tag">常驻</span></div>
+      <div class="desc">长时间没用的 Dock 应用自动帮你退出，给内存腾地方。</div></div>
+
+    <div class="item"><div class="row1"><span class="name">开机自启三件套</span><span class="tag">开机</span></div>
+      <div class="desc">v2rayN（代理）、Hammerspoon（上面所有快捷键的引擎）、美国住宅代理保活（每 15 秒检查一次连接）。<b>快捷键全部失灵时，先检查 Hammerspoon 是否活着。</b></div></div>
+  </section>
+
+  <div class="empty" id="empty">没搜到，换个关键词试试</div>
+
+  <footer>
+    <p><b>东西都放在哪：</b>Raycast 脚本在「文稿/RaycastScripts」；快捷键配置在 ~/.hammerspoon/init.lua；定时任务由 Claude 管理。</p>
+    <p><b>怎么更新这页：</b>以后加了新功能，对 Claude 说「更新我的自动化功能对照表」即可重新生成。</p>
+  </footer>
+</div>
+
+<script>
+  const q = document.getElementById('q');
+  const items = [...document.querySelectorAll('.item')];
+  const sections = [...document.querySelectorAll('section')];
+  const empty = document.getElementById('empty');
+  q.addEventListener('input', () => {
+    const kw = q.value.trim().toLowerCase();
+    let shown = 0;
+    items.forEach(it => {
+      const hit = !kw || it.textContent.toLowerCase().includes(kw);
+      it.style.display = hit ? '' : 'none';
+      if (hit) shown++;
+    });
+    sections.forEach(sec => {
+      const any = [...sec.querySelectorAll('.item')].some(it => it.style.display !== 'none');
+      sec.style.display = any ? '' : 'none';
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>
