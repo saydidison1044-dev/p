@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>经济学全景学习路径</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16261f;
+    --paper:#f4f1e6;
+    --paper-deep:#eae4d2;
+    --pine:#1f4d3d;
+    --pine-deep:#13352a;
+    --gold:#b8862e;
+    --rust:#9a4530;
+    --line:#c9bfa0;
+    --muted:#6b6655;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans SC", sans-serif;
+    font-weight:400;
+    line-height:1.75;
+  }
+  h1,h2,h3,.serif{font-family:"Noto Serif SC", serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(184,134,46,0.16), transparent 55%),
+      var(--pine-deep);
+    color:var(--paper);
+    padding:96px 0 72px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:6px solid var(--gold);
+  }
+  .hero .eyebrow{
+    font-family:"Source Code Pro", monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12.5px;
+    color:#d9c98d;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(34px,5vw,54px);
+    font-weight:900;
+    margin:0 0 18px;
+    line-height:1.25;
+    max-width:760px;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--gold);
+  }
+  .hero p.lead{
+    max-width:600px;
+    font-size:16.5px;
+    color:#cfd8ce;
+    margin:0 0 36px;
+  }
+  .hero .meta-row{
+    display:flex;
+    gap:36px;
+    flex-wrap:wrap;
+    border-top:1px solid rgba(244,241,230,0.18);
+    padding-top:22px;
+  }
+  .hero .meta-row div{font-size:13px;color:#bcc7bd;}
+  .hero .meta-row strong{
+    display:block;
+    font-family:"Noto Serif SC",serif;
+    font-size:20px;
+    color:var(--paper);
+    margin-bottom:2px;
+  }
+
+  /* ---------- RIVER MAP ---------- */
+  .river-section{padding:64px 0 20px;}
+  .river-section h2.section-title{
+    font-size:13px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--rust);
+    font-family:"Source Code Pro",monospace;
+    font-weight:500;
+    margin:0 0 6px;
+  }
+  .river-section h2.section-headline{
+    font-size:28px;
+    margin:0 0 36px;
+    font-weight:700;
+  }
+  .river{position:relative;padding-left:28px;}
+  .river::before{
+    content:"";
+    position:absolute;
+    left:5px; top:6px; bottom:6px;
+    width:2px;
+    background:repeating-linear-gradient(to bottom, var(--pine) 0 6px, transparent 6px 12px);
+  }
+  .stage-nav{
+    position:relative;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    cursor:default;
+  }
+  .stage-nav::before{
+    content:"";
+    position:absolute;
+    left:-27px; top:4px;
+    width:12px;height:12px;
+    border-radius:50%;
+    background:var(--paper);
+    border:3px solid var(--pine);
+  }
+  .stage-nav .s-tag{
+    font-family:"Source Code Pro",monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:.06em;
+  }
+  .stage-nav .s-title{font-weight:700;font-size:16.5px;margin-top:2px;}
+  .stage-nav .s-sub{font-size:13.5px;color:var(--muted);margin-top:2px;}
+
+  /* ---------- STAGE BLOCKS ---------- */
+  .stage{
+    padding:54px 0;
+    border-top:1px solid var(--line);
+  }
+  .stage-head{
+    display:flex;
+    align-items:baseline;
+    gap:18px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .stage-num{
+    font-family:"Noto Serif SC",serif;
+    font-weight:900;
+    font-size:42px;
+    color:var(--paper-deep);
+    -webkit-text-stroke:1.4px var(--pine);
+    line-height:1;
+  }
+  .stage-title{font-size:23px;font-weight:700;}
+  .stage-goal{
+    color:var(--muted);
+    font-size:14.5px;
+    margin:6px 0 26px;
+    max-width:680px;
+  }
+  .stage-duration{
+    display:inline-block;
+    font-family:"Source Code Pro",monospace;
+    font-size:11.5px;
+    background:var(--pine);
+    color:var(--paper);
+    padding:3px 10px;
+    border-radius:2px;
+    margin-left:auto;
+  }
+
+  table.booklist{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    margin-bottom:6px;
+  }
+  table.booklist th{
+    text-align:left;
+    font-family:"Source Code Pro",monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    border-bottom:1.5px solid var(--ink);
+    padding:0 12px 8px 0;
+    font-weight:500;
+  }
+  table.booklist td{
+    padding:14px 12px 14px 0;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.booklist tr:last-child td{border-bottom:1px solid var(--line);}
+  .book-title{font-weight:700;font-family:"Noto Serif SC",serif;font-size:15.5px;}
+  .book-author{display:block;font-size:12.5px;color:var(--muted);font-weight:400;font-family:"Noto Sans SC",sans-serif;margin-top:2px;}
+  .why{color:#3a382f;}
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    font-family:"Source Code Pro",monospace;
+    padding:2px 7px;
+    border:1px solid var(--rust);
+    color:var(--rust);
+    border-radius:2px;
+    white-space:nowrap;
+  }
+  .tag.core{border-color:var(--pine);color:var(--pine);}
+  .tag.cn{border-color:var(--gold);color:#8a6418;}
+
+  .note{
+    margin-top:22px;
+    padding:16px 18px;
+    background:var(--paper-deep);
+    border-left:3px solid var(--rust);
+    font-size:13.8px;
+  }
+  .note.tip{border-left-color:var(--gold);}
+  .note b{font-family:"Noto Serif SC",serif;}
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    background:var(--pine-deep);
+    color:#cfd8ce;
+    padding:54px 0 60px;
+    margin-top:40px;
+  }
+  .footer h3{color:var(--paper);font-size:19px;margin:0 0 14px;}
+  .footer .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:28px;
+    margin-top:24px;
+  }
+  .footer .grid div p{font-size:13px;margin:0;color:#a9b4ac;}
+  .footer .grid div strong{display:block;font-family:"Noto Serif SC",serif;font-size:14.5px;color:var(--paper);margin-bottom:6px;}
+  .footer-final{
+    margin-top:36px;
+    padding-top:24px;
+    border-top:1px solid rgba(244,241,230,0.18);
+    font-size:13px;
+    color:#8e9a91;
+  }
+
+  @media(max-width:640px){
+    .hero{padding:64px 0 48px;}
+    table.booklist, table.booklist tbody, table.booklist tr, table.booklist td{display:block;width:100%;}
+    table.booklist th{display:none;}
+    table.booklist td{border-bottom:none;padding:4px 0;}
+    table.booklist tr{padding:14px 0;border-bottom:1px solid var(--line);}
+    .stage-duration{margin-left:0;}
+  }
+  ::selection{background:var(--gold);color:var(--pine-deep);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">ECONOMICS · READING ROADMAP · 2026</div>
+    <h1>从曼昆出发，<br>建立一套<em>完整的经济学认知地图</em></h1>
+    <p class="lead">这不是一份书单，而是一条按"认知层级"排布的路径——先打通微观/宏观的统一框架，再补齐方法论工具，最后在思想史与专题中建立自己的判断力。</p>
+    <div class="meta-row">
+      <div><strong>6</strong>个阶段</div>
+      <div><strong>18-24个月</strong>建议周期（业余时间）</div>
+      <div><strong>起点</strong>曼昆《经济学原理》</div>
+      <div><strong>终点</strong>能独立评判政策与投资逻辑</div>
+    </div>
+  </div>
+</header>
+
+<section class="river-section wrap">
+  <h2 class="section-title">Route Overview</h2>
+  <h2 class="section-headline">六段式路径总览</h2>
+  <div class="river">
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 0 · 已完成</div>
+      <div class="s-title">入门框架 — 曼昆《经济学原理》</div>
+      <div class="s-sub">建立"边际分析 / 权衡取舍"的基本直觉</div>
+    </div>
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 1</div>
+      <div class="s-title">中级巩固 — 把直觉变成模型</div>
+      <div class="s-sub">中级微观、中级宏观，开始接触数学化表达</div>
+    </div>
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 2</div>
+      <div class="s-title">方法论工具箱 — 计量与货币金融</div>
+      <div class="s-sub">学会用数据检验模型，理解货币体系运作</div>
+    </div>
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 3</div>
+      <div class="s-title">专题深化 — 博弈论 / 行为经济学 / 制度经济学</div>
+      <div class="s-sub">补齐主流经济学之外的关键分析工具</div>
+    </div>
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 4</div>
+      <div class="s-title">思想史与经典原著</div>
+      <div class="s-sub">回到源头，理解各学派分歧从何而来</div>
+    </div>
+    <div class="stage-nav">
+      <div class="s-tag">STAGE 5</div>
+      <div class="s-title">中国经济与应用实战</div>
+      <div class="s-sub">把框架落到你熟悉的金融、养老、政策场景</div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE 1 -->
+<section class="stage wrap" id="s1">
+  <div class="stage-head">
+    <span class="stage-num">01</span>
+    <span class="stage-title">中级巩固 — 把直觉变成模型</span>
+    <span class="stage-duration">建议 3-4 个月</span>
+  </div>
+  <p class="stage-goal">曼昆给你的是"故事化"的经济学。这一阶段要补上数学结构：无差异曲线、IS-LM、AD-AS——这是后续一切专题阅读的地基，跳过容易导致"只会讲故事，不会推导"。</p>
+  <table class="booklist">
+    <thead><tr><th style="width:34%">著作</th><th style="width:40%">为什么读</th><th>标签</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="book-title">《中级微观经济学：现代观点》</span><span class="book-author">Hal Varian</span></td>
+        <td class="why">最严谨的中级微观教材，效用最大化、一般均衡、博弈论初步都有覆盖，习题质量高。</td>
+        <td><span class="tag core">核心</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《宏观经济学》（中级）</span><span class="book-author">Olivier Blanchard</span></td>
+        <td class="why">IS-LM、菲利普斯曲线、增长理论一以贯之，比曼昆宏观更系统，叙述仍然友好。</td>
+        <td><span class="tag core">核心</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《经济解释》</span><span class="book-author">张五常</span></td>
+        <td class="why">用真实世界案例重构微观经济学逻辑，对"价格理论"的直觉训练极强，中文世界少见的硬核原创。</td>
+        <td><span class="tag cn">中文</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>⚠️ 需要注意：</b> 中级教材开始要求基础微积分（导数、偏导）和基础统计。如果这部分生疏，先花 2-3 周过一遍可汗学院的微积分入门，否则后面会卡在数学符号上而非经济学逻辑上。
+  </div>
+</section>
+
+<!-- STAGE 2 -->
+<section class="stage wrap" id="s2">
+  <div class="stage-head">
+    <span class="stage-num">02</span>
+    <span class="stage-title">方法论工具箱 — 计量与货币金融</span>
+    <span class="stage-duration">建议 3-4 个月</span>
+  </div>
+  <p class="stage-goal">经济学是一门用数据检验理论的学科。这一阶段让你具备"读懂一篇实证论文 / 一份央行报告"的能力，对你本职的养老金融工作也有直接迁移价值。</p>
+  <table class="booklist">
+    <thead><tr><th style="width:34%">著作</th><th style="width:40%">为什么读</th><th>标签</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="book-title">《计量经济学导论：现代观点》</span><span class="book-author">Jeffrey Wooldridge</span></td>
+        <td class="why">业界公认的计量入门标杆，OLS、内生性、面板数据讲得清楚，配合 R/Python 练习效果最好。</td>
+        <td><span class="tag core">核心</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《货币金融学》</span><span class="book-author">Frederic Mishkin</span></td>
+        <td class="why">利率、银行体系、央行政策传导机制的标准教材，直接对应你在私人银行/养老金融领域的知识缺口。</td>
+        <td><span class="tag core">核心</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《置身事内：中国政府与经济发展》</span><span class="book-author">兰小欢</span></td>
+        <td class="why">把宏观框架套进中国财政、土地、地方政府投融资的真实运作，是理解国内政策逻辑的最佳过渡读物。</td>
+        <td><span class="tag cn">中文</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note tip">
+    <b>💡 补充：</b> 不必把计量经济学学到能独立做研究的程度——目标是"看懂别人的实证结果、识别明显的方法论硬伤"（比如混淆相关与因果）。这个程度大约 80-100 小时投入即可达到。
+  </div>
+</section>
+
+<!-- STAGE 3 -->
+<section class="stage wrap" id="s3">
+  <div class="stage-head">
+    <span class="stage-num">03</span>
+    <span class="stage-title">专题深化 — 博弈论 / 行为经济学 / 制度经济学</span>
+    <span class="stage-duration">建议 4-5 个月</span>
+  </div>
+  <p class="stage-goal">主流新古典框架假设"理性人"和"完美市场"，这一阶段补上三块关键拼图：策略互动、心理偏误、交易成本与制度——你之前读的孟格、系统思考都能在这里找到经济学语言的对应物。</p>
+  <table class="booklist">
+    <thead><tr><th style="width:34%">著作</th><th style="width:40%">为什么读</th><th>标签</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="book-title">《博弈论》</span><span class="book-author">Robert Gibbons</span></td>
+        <td class="why">最简洁的博弈论入门，纳什均衡、重复博弈、不完全信息一气呵成，篇幅可控。</td>
+        <td><span class="tag core">核心</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《思考，快与慢》</span><span class="book-author">Daniel Kahneman</span></td>
+        <td class="why">行为经济学的源头文献，系统一/系统二框架是理解"非理性"市场行为的基础语言。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《错误的行为》</span><span class="book-author">Richard Thaler</span></td>
+        <td class="why">行为经济学如何被主流接纳的第一手叙事，禀赋效应、心理账户对理解客户决策（私人银行场景）很有用。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《企业的性质》《社会成本问题》</span><span class="book-author">Ronald Coase（论文）</span></td>
+        <td class="why">交易成本理论的原始文献，篇幅短但是制度经济学绕不开的源头，建议直接读论文而非二手转述。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《制度、制度变迁与经济绩效》</span><span class="book-author">Douglass North</span></td>
+        <td class="why">把"制度"作为经济增长的内生变量来分析，呼应你对系统思考和权力分析的兴趣。</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>⚠️ 需要注意：</b> 这一阶段容易陷入"行为经济学 = 经济学常识 + 心理学标签"的浅层印象。建议同时保留一份怀疑：行为经济学的很多实验效应在重复检验中被削弱（如禀赋效应的效应量近年被下修），不要把它当作可以替代价格理论的万能框架。
+  </div>
+</section>
+
+<!-- STAGE 4 -->
+<section class="stage wrap" id="s4">
+  <div class="stage-head">
+    <span class="stage-num">04</span>
+    <span class="stage-title">思想史与经典原著</span>
+    <span class="stage-duration">建议 4-6 个月</span>
+  </div>
+  <p class="stage-goal">前三个阶段教你"如何用经济学的工具思考"，这一阶段教你"经济学家为什么会吵架"——理解凯恩斯主义、奥地利学派、芝加哥学派、马克思主义经济学的根本分歧，建立自己的立场而非人云亦云。</p>
+  <table class="booklist">
+    <thead><tr><th style="width:34%">著作</th><th style="width:40%">为什么读</th><th>标签</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="book-title">《国富论》（节选精读即可）</span><span class="book-author">Adam Smith</span></td>
+        <td class="why">分工、看不见的手——现代经济学几乎所有分支的共同祖先，建议读分工与价格章节，不必通读全书。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《就业、利息和货币通论》</span><span class="book-author">John Maynard Keynes</span></td>
+        <td class="why">宏观经济学的分水岭，理解"为什么政府要干预经济"这一立场的原始论证，文笔晦涩但值得啃。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《通往奴役之路》</span><span class="book-author">Friedrich Hayek</span></td>
+        <td class="why">奥地利学派对计划经济的根本性批判，与凯恩斯形成清晰的思想对照组。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《资本主义与自由》</span><span class="book-author">Milton Friedman</span></td>
+        <td class="why">芝加哥学派、货币主义的代表作，理解"自由市场 vs 政府干预"这条主线在二十世纪的演变。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《资本论》第一卷（精读核心章节）</span><span class="book-author">Karl Marx</span></td>
+        <td class="why">无论是否认同其结论，剩余价值、资本积累的分析框架仍是理解收入分配争论的重要参照系。</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note tip">
+    <b>💡 补充：</b> 这一阶段建议配合一本思想史导读，比如海尔布隆纳的《世俗哲学家》（The Worldly Philosophers），先读导读建立人物关系和时代背景，再读原著会顺畅很多，避免直接硬啃原文产生挫败感。
+  </div>
+</section>
+
+<!-- STAGE 5 -->
+<section class="stage wrap" id="s5">
+  <div class="stage-head">
+    <span class="stage-num">05</span>
+    <span class="stage-title">中国经济与应用实战</span>
+    <span class="stage-duration">持续进行</span>
+  </div>
+  <p class="stage-goal">把前面建立的整套框架，落到你每天接触的真实场景——养老金融、利率政策、人口结构、资产配置。这一阶段不追求读完，而是养成"用框架读新闻/读研报"的习惯。</p>
+  <table class="booklist">
+    <thead><tr><th style="width:34%">著作 / 资源</th><th style="width:40%">为什么读</th><th>标签</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="book-title">《新结构经济学》</span><span class="book-author">林毅夫</span></td>
+        <td class="why">理解发展经济学视角下的中国增长路径争论，与张五常的产权视角形成对照。</td>
+        <td><span class="tag cn">中文</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《人口与未来》系列研究</span><span class="book-author">任泽平 / 梁建章 等</span></td>
+        <td class="why">人口结构与养老金体系直接相关，是你工作领域最该建立的专题知识。</td>
+        <td><span class="tag cn">中文</span></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">中国人民银行 / IMF 季度报告精读</span><span class="book-author">机构研报</span></td>
+        <td class="why">用 Stage 2 学到的货币金融框架去读一手政策文件，比读二手解读更能训练判断力。</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="book-title">《橡皮筋：全球失衡与资本流动》</span><span class="book-author">Michael Pettis</span></td>
+        <td class="why">从国际收支视角理解中国储蓄率、贸易顺差与全球资本流动的关系，视角独特且论证扎实。</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>⚠️ 需要注意：</b> 中国经济议题的研报/媒体文章意识形态色彩较重，建议同一议题至少交叉对比 2-3 个立场不同的来源（如官方智库 vs 市场化研究机构 vs 海外学者），再结合前四阶段的理论框架自己做判断，避免被单一叙事带偏。
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <h3>如何使用这份路径</h3>
+    <div class="grid">
+      <div>
+        <strong>顺序可以打破</strong>
+        <p>Stage 1-2 建议按序完成，是后续一切的地基。Stage 3-4-5 之间可以并行——比如读思想史的同时穿插中国经济专题，互相印证比线性推进更有效。</p>
+      </div>
+      <div>
+        <strong>每阶段产出一张知识卡片</strong>
+        <p>结合你已有的 knowledge-card 工作流，每读完一本书沉淀一张"背景/关键分析/结论与行动项"卡片，存入 Notion，逐步建立自己的经济学论点库。</p>
+      </div>
+      <div>
+        <strong>警惕"读完就懂"的错觉</strong>
+        <p>经济学的检验标准是能否用模型解释一个具体现象（比如最近的房地产数据、利率政策）。建议每个阶段结束后，挑一个真实事件用本阶段框架写一段分析。</p>
+      </div>
+    </div>
+    <div class="footer-final">全程预计 18-24 个月（业余时间，每周 5-8 小时）。这条路径偏"系统性 + 思想史"，如果你的目标更偏向"金融市场实战"，可以告诉我，我可以单独规划一条以资产定价、宏观对冲为主线的精简路径。</div>
+  </div>
+</footer>
+
+</body>
+</html>
