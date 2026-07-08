@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>升三年级 · 能力地图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EF;
+    --paper-2:#F4EEE1;
+    --ink:#2A2520;
+    --ink-soft:#736A5E;
+    --ink-faint:#A89E8F;
+    --line:#E6DDCB;
+    --line-soft:#EFE8DA;
+
+    --chinese:#C24A38;      --chinese-bg:#FBEEEA;   --chinese-edge:#EAC9C1;
+    --math:#2C6CA6;         --math-bg:#E9F1F9;      --math-edge:#C4D8EA;
+    --english:#1F8A7B;      --english-bg:#E4F2EF;   --english-edge:#BFE0D8;
+
+    --amber:#C7831F;        --amber-bg:#FBF0D9;     --amber-edge:#EAD3A0;
+
+    --serif:"Noto Serif SC",serif;
+    --sans:"Noto Sans SC",system-ui,sans-serif;
+    --mono:"Space Grotesk",var(--sans);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 12% -5%, rgba(31,138,123,.05), transparent 38%),
+      radial-gradient(circle at 90% 4%, rgba(194,74,56,.05), transparent 36%);
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- HERO ---------- */
+  header.hero{padding:64px 0 30px}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--chinese)}
+  h1.title{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(40px,7vw,76px);
+    line-height:1.02;letter-spacing:-.01em;
+    margin-bottom:18px;
+  }
+  h1.title .leap{
+    color:var(--english);
+    position:relative;white-space:nowrap;
+  }
+  .lede{
+    font-size:clamp(16px,2vw,19px);
+    color:var(--ink-soft);max-width:660px;
+    margin-bottom:30px;
+  }
+  .lede b{color:var(--ink);font-weight:700}
+
+  .books{display:flex;gap:10px;flex-wrap:wrap}
+  .book{
+    display:inline-flex;align-items:baseline;gap:8px;
+    padding:8px 15px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);
+    font-size:14px;font-weight:500;
+  }
+  .book .k{font-family:var(--serif);font-weight:700;font-size:15px}
+  .book.cn .k{color:var(--chinese)} .book.cn{border-color:var(--chinese-edge);background:var(--chinese-bg)}
+  .book.ma .k{color:var(--math)}    .book.ma{border-color:var(--math-edge);background:var(--math-bg)}
+  .book.en .k{color:var(--english)} .book.en{border-color:var(--english-edge);background:var(--english-bg)}
+  .book .v{color:var(--ink-soft);font-size:13px}
+
+  /* ---------- LEAP BANNER ---------- */
+  .leap-band{
+    margin:38px 0 8px;
+    border:1px solid var(--line);border-radius:18px;
+    background:linear-gradient(180deg,#fff, #FCF9F2);
+    padding:26px 28px;
+    display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;
+  }
+  .grades{display:flex;align-items:center;gap:14px;font-family:var(--serif)}
+  .g{text-align:center;line-height:1.1}
+  .g .num{font-size:34px;font-weight:900}
+  .g.from .num{color:var(--ink-faint)}
+  .g.to .num{color:var(--ink)}
+  .g .lab{font-family:var(--sans);font-size:12px;color:var(--ink-soft);font-weight:500;letter-spacing:.05em}
+  .arrow{display:flex;flex-direction:column;align-items:center;color:var(--amber);min-width:74px}
+  .arrow svg{width:74px;height:20px}
+  .arrow .word{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--amber);margin-top:2px}
+  .leap-copy h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:5px}
+  .leap-copy p{font-size:15px;color:var(--ink-soft)}
+  .leap-copy b{color:var(--ink)}
+
+  /* ---------- THESIS ---------- */
+  .thesis{
+    margin:30px 0 8px;
+    background:var(--ink);color:#F6EFE2;
+    border-radius:18px;padding:30px 32px;
+    position:relative;overflow:hidden;
+  }
+  .thesis::before{
+    content:"核心判断";font-family:var(--mono);
+    position:absolute;top:18px;right:24px;
+    font-size:12px;letter-spacing:.2em;color:rgba(246,239,226,.42);
+  }
+  .thesis p{font-size:clamp(18px,2.5vw,23px);font-family:var(--serif);font-weight:500;line-height:1.55;max-width:780px}
+  .thesis .hi{color:#F2B752;font-weight:700}
+  .thesis .hi2{color:#7FD3C4;font-weight:700}
+
+  /* ---------- SECTION LABEL ---------- */
+  .seclabel{
+    display:flex;align-items:center;gap:14px;
+    margin:56px 0 22px;
+  }
+  .seclabel .n{font-family:var(--mono);font-size:14px;color:var(--ink-faint);font-weight:700}
+  .seclabel h3{font-family:var(--serif);font-size:clamp(22px,3vw,28px);font-weight:700}
+  .seclabel .rule{flex:1;height:1px;background:var(--line)}
+
+  /* ---------- FOCUS (the two hard points) ---------- */
+  .focus-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .focus{
+    border-radius:18px;padding:24px 26px;
+    background:var(--amber-bg);border:1px solid var(--amber-edge);
+    position:relative;
+  }
+  .focus .tag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;font-weight:700;letter-spacing:.04em;
+    color:#fff;background:var(--amber);
+    padding:4px 11px;border-radius:999px;margin-bottom:14px;
+  }
+  .focus h4{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:8px}
+  .focus h4 .sub{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink-soft);display:block;margin-top:2px}
+  .focus p{font-size:15px;color:#5f5240}
+  .focus .shift{
+    display:flex;align-items:center;gap:9px;margin-top:14px;
+    font-size:13px;flex-wrap:wrap;
+  }
+  .focus .shift .chip{background:#fff;border:1px solid var(--amber-edge);border-radius:8px;padding:4px 10px;color:var(--ink-soft)}
+  .focus .shift .chip.now{color:var(--ink);font-weight:700;border-color:var(--amber)}
+  .focus .shift .ar{color:var(--amber);font-weight:700}
+
+  /* ---------- SUBJECT CARDS ---------- */
+  .subjects{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{
+    background:#fff;border:1px solid var(--line);
+    border-radius:20px;overflow:hidden;
+    display:flex;flex-direction:column;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+  }
+  .card:hover{transform:translateY(-5px);box-shadow:0 18px 40px -22px rgba(42,37,32,.4)}
+  .card .head{padding:22px 22px 18px;border-bottom:1px solid var(--line-soft)}
+  .card .subj{font-family:var(--serif);font-size:26px;font-weight:900;display:flex;align-items:center;gap:10px}
+  .card .ver{font-size:12.5px;color:var(--ink-soft);margin-top:4px;font-weight:500}
+  .swatch{width:14px;height:14px;border-radius:5px;flex:none}
+  .card.cn .subj{color:var(--chinese)} .card.cn .swatch{background:var(--chinese)} .card.cn .head{background:var(--chinese-bg)}
+  .card.ma .subj{color:var(--math)}    .card.ma .swatch{background:var(--math)}    .card.ma .head{background:var(--math-bg)}
+  .card.en .subj{color:var(--english)} .card.en .swatch{background:var(--english)} .card.en .head{background:var(--english-bg)}
+
+  .layer{padding:18px 22px;border-bottom:1px solid var(--line-soft)}
+  .layer:last-child{border-bottom:none}
+  .layer .lh{
+    display:flex;align-items:center;gap:8px;margin-bottom:11px;
+    font-size:12px;font-weight:700;letter-spacing:.04em;
+  }
+  .layer .lh .ico{font-size:14px}
+  .layer.base .lh{color:var(--ink-soft)}
+  .layer.up .lh{color:var(--ink)}
+  .layer .lh .mini{font-weight:500;color:var(--ink-faint);letter-spacing:0}
+  ul.skl{list-style:none;display:flex;flex-direction:column;gap:9px}
+  ul.skl li{position:relative;padding-left:18px;font-size:14.5px;color:var(--ink);line-height:1.5}
+  ul.skl li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:2px;background:var(--line)}
+  .card.cn ul.skl li::before{background:var(--chinese-edge)}
+  .card.ma ul.skl li::before{background:var(--math-edge)}
+  .card.en ul.skl li::before{background:var(--english-edge)}
+  ul.skl li b{font-weight:700}
+
+  .keypt{margin:0;padding:16px 22px;background:var(--amber-bg);border-top:1px solid var(--amber-edge)}
+  .keypt .kt{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.04em;margin-bottom:5px}
+  .keypt p{font-size:14px;color:#5f5240;line-height:1.55}
+  .keypt p b{color:var(--ink);font-weight:700}
+
+  /* ---------- PITFALLS ---------- */
+  .pits{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .pit{
+    border:1px solid var(--chinese-edge);border-radius:18px;
+    background:var(--chinese-bg);padding:22px 22px;
+  }
+  .pit .num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--chinese);letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .pit .num .warn{font-size:15px}
+  .pit h4{font-family:var(--serif);font-size:17px;font-weight:700;margin-bottom:7px;line-height:1.35}
+  .pit p{font-size:14px;color:#6a5247}
+  .pit p b{color:var(--chinese);font-weight:700}
+
+  /* ---------- NEXT ---------- */
+  .next{
+    margin:56px 0 20px;
+    border:1px dashed var(--english-edge);border-radius:20px;
+    background:var(--english-bg);padding:30px 32px;
+  }
+  .next h3{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--english);margin-bottom:6px}
+  .next .intro{font-size:15px;color:var(--ink-soft);margin-bottom:20px;max-width:640px}
+  .needs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .need{background:#fff;border:1px solid var(--english-edge);border-radius:14px;padding:16px 18px}
+  .need .q{font-size:12px;font-weight:700;color:var(--english);letter-spacing:.05em;margin-bottom:6px}
+  .need p{font-size:14px;color:var(--ink)}
+
+  footer{padding:40px 0 60px;color:var(--ink-faint);font-size:13px;text-align:center;border-top:1px solid var(--line);margin-top:50px}
+  footer .mono{font-family:var(--mono)}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:880px){
+    .subjects{grid-template-columns:1fr}
+    .pits{grid-template-columns:1fr}
+    .focus-grid{grid-template-columns:1fr}
+    .needs{grid-template-columns:1fr}
+    .leap-band{grid-template-columns:1fr;gap:18px}
+  }
+  @media(max-width:520px){
+    header.hero{padding:44px 0 20px}
+    .thesis,.leap-band,.next{padding:22px 20px}
+  }
+
+  a.skip{position:absolute;left:-999px}
+  a.skip:focus{left:16px;top:16px;background:var(--ink);color:#fff;padding:8px 14px;border-radius:8px;z-index:9}
+  :focus-visible{outline:2.5px solid var(--math);outline-offset:3px;border-radius:4px}
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<a href="#subjects" class="skip">跳到三科能力地图</a>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">
+      <span class="dot"></span>成都 · 二年级升三年级 · 2026 暑假
+    </div>
+    <h1 class="title">升三年级<br>能力<span class="leap">地图</span></h1>
+    <p class="lede">这个暑假真正该做的，<b>不是提前把三年级课本学一遍</b>，而是补牢二年级的地基，并提前攻克三年级最容易让孩子掉队的两件事——<b>写成篇的作文</b>和<b>解多步应用题</b>。下面是按学科拆好的能力清单，供你对照孩子实际情况研究。</p>
+    <div class="books">
+      <span class="book cn"><span class="k">语文</span><span class="v">人教版（统编）</span></span>
+      <span class="book ma"><span class="k">数学</span><span class="v">北师大版</span></span>
+      <span class="book en"><span class="k">英语</span><span class="v">外研版 · 一年级起点</span></span>
+    </div>
+
+    <div class="leap-band reveal">
+      <div class="grades">
+        <div class="g from"><div class="num">2</div><div class="lab">二年级</div></div>
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 74 20" fill="none"><path d="M2 10 H62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M55 3 L66 10 L55 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <span class="word">分水岭</span>
+        </div>
+        <div class="g to"><div class="num">3</div><div class="lab">三年级</div></div>
+      </div>
+      <div class="leap-copy">
+        <h2>为什么三年级是一道坎</h2>
+        <p>这一年孩子要完成三个跳跃：阅读从<b>读句子</b>到<b>读篇章</b>、写作从<b>写话</b>到<b>成篇作文</b>、数学从<b>形象思维</b>到<b>抽象解题</b>。掉队往往不发生在计算或识字上，而发生在这三个"跳跃点"。暑假的发力方向就由它决定。</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="thesis reveal">
+    <p>把暑假精力分两份：一份补<span class="hi2">地基</span>（乘法口诀、书写、拼音、听说），一份攻<span class="hi">真难点</span>（习作 + 多步应用题）。别把时间耗在反复刷计算和抄写上——那不是三年级掉队的主因。</p>
+  </section>
+
+  <div class="seclabel reveal">
+    <span class="n">★</span>
+    <h3>暑假主攻区：三年级两大真难点</h3>
+    <span class="rule"></span>
+  </div>
+
+  <div class="focus-grid">
+    <div class="focus reveal">
+      <span class="tag">⚠ 语文主攻</span>
+      <h4>写成篇的作文<span class="sub">从"看图写几句"到"围绕一个意思写一整篇"</span></h4>
+      <p>三年级正式进入"习作"。很多孩子怕语文就是从这里开始的。暑假别急着练写，先把<b>大量阅读</b>和<b>口头表达</b>铺好——孩子先会"说清一件事"，才写得出来。</p>
+      <div class="shift">
+        <span class="chip">写话 · 不限字数</span><span class="ar">→</span><span class="chip now">习作 · 成篇 200–300 字</span>
+      </div>
+    </div>
+    <div class="focus reveal">
+      <span class="tag">⚠ 数学主攻</span>
+      <h4>多步应用题<span class="sub">从"一步算出答案"到"先求中间量、再列综合算式"</span></h4>
+      <p>这是抽象思维的跳跃，也是数学"分水岭"的核心。难点不在算，而在<b>读懂题、理清数量关系</b>。暑假可以用生活场景带孩子练"这道题要先求什么"。</p>
+      <div class="shift">
+        <span class="chip">一步问题</span><span class="ar">→</span><span class="chip now">两步 / 多步问题</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="seclabel reveal" id="subjects">
+    <span class="n">01</span>
+    <h3>三科能力地图</h3>
+    <span class="rule"></span>
+  </div>
+
+  <div class="subjects">
+
+    <!-- 语文 -->
+    <article class="card cn reveal">
+      <div class="head">
+        <div class="subj"><span class="swatch"></span>语文</div>
+        <div class="ver">人教版（统编教材）</div>
+      </div>
+      <div class="layer base">
+        <div class="lh"><span class="ico">▣</span>地基层 <span class="mini">· 二年级要补牢</span></div>
+        <ul class="skl">
+          <li>写字规范、笔顺正确，<b>不写错别字</b></li>
+          <li>拼音过关，会背指定古诗</li>
+          <li>能完整、连贯地说清一件事</li>
+        </ul>
+      </div>
+      <div class="layer up">
+        <div class="lh"><span class="ico">▲</span>跃迁层 <span class="mini">· 三年级新要求</span></div>
+        <ul class="skl">
+          <li>独立<b>查字典</b>（部首查字法 + 音序查字法）</li>
+          <li>读懂整段整篇：概括段意、提取信息、联系上下文理解词语</li>
+          <li><b>习作</b>：围绕一个意思写成篇，有条理、有顺序</li>
+          <li>成语 / 好词好句 / 古诗积累量加大，并能"会用"</li>
+        </ul>
+      </div>
+      <div class="keypt">
+        <div class="kt">★ 主攻点</div>
+        <p><b>习作</b>——从"写话"到"成篇作文"。底层靠<b>阅读量 + 口头表达</b>，不是靠多写。</p>
+      </div>
+    </article>
+
+    <!-- 数学 -->
+    <article class="card ma reveal">
+      <div class="head">
+        <div class="subj"><span class="swatch"></span>数学</div>
+        <div class="ver">北师大版 · 重情境与生活联系</div>
+      </div>
+      <div class="layer base">
+        <div class="lh"><span class="ico">▣</span>地基层 <span class="mini">· 二年级要补牢</span></div>
+        <ul class="skl">
+          <li><b>乘法口诀滚瓜烂熟</b>（三年级乘除法的地基）</li>
+          <li>100 以内加减法熟练</li>
+          <li>看图列式、读懂简单图意</li>
+        </ul>
+      </div>
+      <div class="layer up">
+        <div class="lh"><span class="ico">▲</span>跃迁层 <span class="mini">· 三年级新要求</span></div>
+        <ul class="skl">
+          <li>多位数乘一位数、除法竖式、混合运算</li>
+          <li>万以内数、<b>分数初步认识</b></li>
+          <li>测量与单位：毫米/分米/千米、克/千克/吨、年月日、时分秒、<b>周长</b></li>
+          <li><b>两步 / 多步应用题</b>：理清数量关系、列综合算式</li>
+        </ul>
+      </div>
+      <div class="keypt">
+        <div class="kt">★ 主攻点</div>
+        <p><b>多步应用题</b>——形象思维到抽象思维的跳跃。先练"读懂题、找中间量"，再谈计算。</p>
+      </div>
+    </article>
+
+    <!-- 英语 -->
+    <article class="card en reveal">
+      <div class="head">
+        <div class="subj"><span class="swatch"></span>英语</div>
+        <div class="ver">外研版 · 一年级起点（已学两年）</div>
+      </div>
+      <div class="layer base">
+        <div class="lh"><span class="ico">▣</span>地基层 <span class="mini">· 巩固已学</span></div>
+        <ul class="skl">
+          <li>26 字母认读与书写过关</li>
+          <li>已学基础词汇、日常句型不遗忘</li>
+          <li>敢听、敢说，保持开口的<b>兴趣</b></li>
+        </ul>
+      </div>
+      <div class="layer up">
+        <div class="lh"><span class="ico">▲</span>跃迁层 <span class="mini">· 三年级过渡重点</span></div>
+        <ul class="skl">
+          <li>从"听说为主"向<b>读写过渡</b>：认读单词、抄写句子</li>
+          <li>自然拼读（Phonics）深化：<b>看词能拼读</b></li>
+          <li>读简单短文，对基础语法（如一般现在时）有初步语感</li>
+          <li>持续磨耳朵：动画 / 绘本音频 / 儿歌输入不断</li>
+        </ul>
+      </div>
+      <div class="keypt">
+        <div class="kt">★ 主攻点</div>
+        <p>已有两年基础，重点是<b>平稳过渡到读写</b>，并<b>守住兴趣</b>——别在这阶段把英语变成负担。</p>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="seclabel reveal">
+    <span class="n">02</span>
+    <h3>三个最容易踩的误区</h3>
+    <span class="rule"></span>
+  </div>
+
+  <div class="pits">
+    <div class="pit reveal">
+      <div class="num"><span class="warn">⚠</span>误区 01</div>
+      <h4>暑假提前学三年级课本</h4>
+      <p>提前学会让孩子开学"我都会了"而上课走神，且家长教法可能和老师冲突。<b>底层能力比抢学知识点更值钱。</b></p>
+    </div>
+    <div class="pit reveal">
+      <div class="num"><span class="warn">⚠</span>误区 02</div>
+      <h4>力气全花在刷计算、抄写上</h4>
+      <p>计算和书写是地基要稳，但不是掉队主因。真正的难点是<b>习作 + 多步应用题</b>，这两项才该重点投入。</p>
+    </div>
+    <div class="pit reveal">
+      <div class="num"><span class="warn">⚠</span>误区 03</div>
+      <h4>盲目报学科班抢跑</h4>
+      <p>双减下学科类校外培训受限，这个年龄段<b>家庭引导 + 兴趣养成</b>的性价比远高于报班。</p>
+    </div>
+  </div>
+
+  <div class="next reveal">
+    <h3>下一步 · 把能力地图转成训练计划</h3>
+    <p class="intro">这份地图是"目标"。要落成可执行的暑假计划，还需要你补三个信息——这样计划才能贴着孩子的实际，而不是一份漂亮但跑不动的清单。</p>
+    <div class="needs">
+      <div class="need">
+        <div class="q">① 薄弱项</div>
+        <p>乘法口诀熟不熟？爱不爱看书？英语听说到什么水平？</p>
+      </div>
+      <div class="need">
+        <div class="q">② 每天投入</div>
+        <p>暑假每天大概能安排多长的学习时间？</p>
+      </div>
+      <div class="need">
+        <div class="q">③ 谁来陪练</div>
+        <p>是你、还是孩子父母在旁边带？决定计划的执行方式。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="mono">SKILL MAP · 成都 · 升三年级</span><br>
+    教材版本：语文 人教版 / 数学 北师大版 / 英语 外研版（一起点）。能力维度为通用框架，具体进度以孩子所在学校教学安排为准。
+  </footer>
+
+</div>
+
+<script>
+  const io = new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
