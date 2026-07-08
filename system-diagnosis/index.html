@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人系统诊断 · 从哪里开始</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F2EA;
+    --bg-2:#EFEBDF;
+    --paper:#FBF9F3;
+    --ink:#16231F;
+    --ink-soft:#2C3A35;
+    --teal:#0E665A;
+    --teal-deep:#0A4A41;
+    --ember:#C56A2B;
+    --ember-soft:#E0995E;
+    --muted:#6E776F;
+    --line:#DCD6C8;
+    --line-soft:#E6E1D5;
+    --font-zh:"PingFang SC","Heiti SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    --font-display:"Space Grotesk","PingFang SC","Microsoft YaHei",sans-serif;
+    --font-mono:"Space Mono","JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink-soft);
+    font-family:var(--font-zh);
+    font-size:17px;
+    line-height:1.9;
+    letter-spacing:.01em;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- document bar ---------- */
+  .docbar{
+    border-bottom:1px solid var(--line);
+    background:rgba(245,242,234,.9);
+  }
+  .docbar .wrap{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-top:18px;padding-bottom:18px;
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .docbar b{color:var(--teal);font-weight:700;}
+
+  /* ---------- eyebrow ---------- */
+  .eyebrow{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--teal);
+    display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1.5px;background:var(--teal);display:inline-block;}
+
+  /* ---------- hero ---------- */
+  .hero{padding-top:74px;padding-bottom:8px;}
+  .hero h1{
+    font-family:var(--font-display);
+    font-size:clamp(2.1rem,6.4vw,3.4rem);
+    line-height:1.12;font-weight:700;letter-spacing:-.01em;
+    color:var(--ink);margin:26px 0 0;
+  }
+  .hero h1 em{font-style:normal;color:var(--ember);}
+  .lead{
+    font-size:clamp(1.02rem,2.2vw,1.18rem);
+    line-height:1.78;color:var(--ink-soft);
+    margin:24px 0 0;max-width:60ch;
+  }
+  .lead strong{color:var(--ink);font-weight:600;}
+
+  /* ---------- weakness chips ---------- */
+  .chips{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    margin:44px 0 0;
+  }
+  .chip{
+    background:var(--paper);border:1px solid var(--line);border-radius:13px;
+    padding:18px 18px 16px;position:relative;overflow:hidden;
+  }
+  .chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .chip.engine::before{background:var(--ember);}
+  .chip.down::before{background:var(--teal);}
+  .chip .tag{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  .chip.engine .tag{color:var(--ember);}
+  .chip.down .tag{color:var(--teal);}
+  .chip .name{
+    font-size:1.12rem;font-weight:600;color:var(--ink);
+    margin-top:7px;line-height:1.35;
+  }
+
+  /* ---------- section frame ---------- */
+  section{padding-top:78px;}
+  .sechead{display:flex;align-items:baseline;gap:18px;margin-bottom:8px;}
+  .secnum{
+    font-family:var(--font-mono);font-size:13px;font-weight:700;
+    color:var(--teal);letter-spacing:.08em;
+    border:1.5px solid var(--teal);border-radius:50%;
+    width:38px;height:38px;flex:0 0 38px;
+    display:flex;align-items:center;justify-content:center;
+    transform:translateY(2px);
+  }
+  h2{
+    font-family:var(--font-display);
+    font-size:clamp(1.55rem,4vw,2.15rem);
+    font-weight:700;letter-spacing:-.005em;color:var(--ink);
+    margin:0;line-height:1.2;
+  }
+  .sub{color:var(--muted);font-size:.96rem;margin:6px 0 0 56px;}
+  .body-blk{margin-top:26px;}
+  .body-blk p{margin:0 0 18px;}
+  .body-blk p strong{color:var(--ink);font-weight:600;}
+  .hl-teal{color:var(--teal);font-weight:600;}
+  .hl-ember{color:var(--ember);font-weight:600;}
+
+  /* ---------- reframe cards ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px;}
+  .rcard{
+    background:var(--paper);border:1px solid var(--line);border-radius:15px;
+    padding:22px 22px 20px;position:relative;
+  }
+  .rcard .rtag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;font-weight:700;
+    padding:4px 10px;border-radius:30px;
+  }
+  .rcard.engine .rtag{color:var(--ember);background:rgba(197,106,43,.1);}
+  .rcard.down .rtag{color:var(--teal);background:rgba(14,102,90,.1);}
+  .rcard .rtag .dot{width:6px;height:6px;border-radius:50%;}
+  .rcard.engine .rtag .dot{background:var(--ember);}
+  .rcard.down .rtag .dot{background:var(--teal);}
+  .rcard h3{font-size:1.18rem;color:var(--ink);margin:14px 0 0;font-weight:600;}
+  .rcard .ess{font-size:.95rem;line-height:1.7;color:var(--ink-soft);margin:10px 0 0;}
+  .rcard .pos{
+    font-size:.86rem;color:var(--muted);margin-top:14px;
+    padding-top:13px;border-top:1px solid var(--line-soft);
+  }
+  .rcard .pos b{color:var(--ink-soft);font-weight:600;}
+
+  /* ---------- key insight callout ---------- */
+  .insight{
+    margin-top:30px;background:var(--ink);color:#EFEDE3;
+    border-radius:16px;padding:30px 30px;position:relative;overflow:hidden;
+  }
+  .insight .k{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ember-soft);
+  }
+  .insight p{margin:14px 0 0;font-size:1.12rem;line-height:1.62;color:#F4F2E8;}
+  .insight p .em{color:var(--ember-soft);font-weight:600;}
+  .insight p .tl{color:#6FD0BF;font-weight:600;}
+
+  /* ---------- loop diagram (SIGNATURE) ---------- */
+  .loopwrap{
+    margin-top:38px;padding:34px 20px 26px;
+    border:1px solid var(--line);border-radius:18px;
+    background:
+      radial-gradient(circle at center, rgba(14,102,90,.04), transparent 70%),
+      radial-gradient(var(--line-soft) 1px, transparent 1px);
+    background-size:auto, 22px 22px;background-position:center;
+  }
+  .loopwrap .cap{
+    text-align:center;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--teal);
+    margin-bottom:8px;
+  }
+  .loopsvg{display:block;width:100%;max-width:430px;height:auto;margin:0 auto;}
+  .loop-track{fill:none;stroke:var(--teal);stroke-width:2;opacity:.45;}
+  .loop-arc-anim{
+    fill:none;stroke:var(--teal);stroke-width:2.5;
+    stroke-dasharray:817;stroke-dashoffset:817;
+    animation:draw 1.6s ease-out .2s forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .node-stage{fill:var(--paper);stroke:var(--teal);stroke-width:2;}
+  .node-engine{fill:#FBEFE3;stroke:var(--ember);stroke-width:2.5;}
+  .node-engine.glow{animation:pulse 2.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{filter:drop-shadow(0 0 0 rgba(197,106,43,0));}50%{filter:drop-shadow(0 0 7px rgba(197,106,43,.5));}}
+  .node-label{font-family:var(--font-zh);font-weight:600;font-size:17px;fill:var(--ink);text-anchor:middle;dominant-baseline:central;}
+  .node-label.eng{fill:var(--ember);}
+  .stuck-tag{font-family:var(--font-mono);font-size:10px;fill:var(--ember);letter-spacing:.04em;}
+  .arrow{fill:var(--teal);}
+  .center-q{font-family:var(--font-display);font-weight:700;font-size:21px;fill:var(--teal-deep);text-anchor:middle;}
+  .center-s{font-family:var(--font-mono);font-size:11px;fill:var(--muted);text-anchor:middle;letter-spacing:.04em;}
+  .travel{fill:var(--ember);}
+
+  .loop-note{
+    margin-top:22px;font-size:.97rem;line-height:1.75;color:var(--ink-soft);
+    text-align:left;max-width:62ch;margin-left:auto;margin-right:auto;
+  }
+  .loop-note + .loop-note{margin-top:0;}
+
+  /* ---------- keystone action (dark hero card) ---------- */
+  .keystone{
+    margin-top:30px;background:var(--ink);border-radius:18px;
+    padding:34px 32px;position:relative;overflow:hidden;
+  }
+  .keystone::after{
+    content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;
+    background:radial-gradient(circle,rgba(197,106,43,.22),transparent 68%);
+  }
+  .keystone .ks-ey{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ember-soft);position:relative;
+  }
+  .keystone .ks-text{
+    font-size:1.3rem;line-height:1.5;color:#F6F4EA;font-weight:500;
+    margin:16px 0 0;position:relative;
+  }
+  .keystone .ks-text b{color:var(--ember-soft);font-weight:700;}
+
+  /* ---------- mechanisms ---------- */
+  .mechs{margin-top:26px;display:flex;flex-direction:column;gap:0;}
+  .mech{
+    display:grid;grid-template-columns:46px 1fr;gap:18px;
+    padding:22px 0;border-top:1px solid var(--line);
+  }
+  .mech:last-child{border-bottom:1px solid var(--line);}
+  .mech .mn{
+    font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--teal);
+  }
+  .mech .mt{font-size:1.08rem;font-weight:600;color:var(--ink);}
+  .mech .mt span{font-family:var(--font-mono);font-size:.8em;color:var(--muted);font-weight:400;}
+  .mech .md{font-size:.96rem;line-height:1.72;color:var(--ink-soft);margin-top:8px;}
+  .mech .md em{font-style:normal;color:var(--teal);font-weight:600;}
+
+  /* ---------- metric strip ---------- */
+  .metric{
+    margin-top:30px;border-left:4px solid var(--teal);
+    background:var(--bg-2);border-radius:0 12px 12px 0;
+    padding:20px 24px;
+  }
+  .metric .mlab{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);}
+  .metric p{margin:8px 0 0;font-size:.98rem;line-height:1.7;color:var(--ink-soft);}
+  .metric p b{color:var(--ink);font-weight:600;}
+  .metric .fine{color:var(--muted);font-size:.88rem;}
+
+  /* ---------- sequence (step 3) ---------- */
+  .seq{margin-top:30px;display:flex;flex-direction:column;gap:20px;}
+  .seq-item{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:24px 24px 22px;}
+  .seq-item .sh{display:flex;align-items:center;gap:12px;}
+  .seq-item .sn{
+    font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;
+    background:var(--teal);border-radius:7px;padding:3px 9px;letter-spacing:.06em;
+  }
+  .seq-item h3{font-size:1.18rem;color:var(--ink);margin:0;font-weight:600;}
+  .seq-item .skicker{color:var(--muted);font-size:.9rem;}
+  .seq-item ol{margin:16px 0 0;padding-left:0;list-style:none;counter-reset:s;}
+  .seq-item ol li{
+    counter-increment:s;position:relative;padding-left:30px;margin-bottom:12px;
+    font-size:.96rem;line-height:1.65;
+  }
+  .seq-item ol li:last-child{margin-bottom:0;}
+  .seq-item ol li::before{
+    content:"("counter(s)")";position:absolute;left:0;top:0;
+    font-family:var(--font-mono);font-size:.82rem;color:var(--teal);font-weight:700;
+  }
+  .seq-item ol li b{color:var(--ink);font-weight:600;}
+  .seq-item .stxt{font-size:.96rem;line-height:1.7;margin:14px 0 0;}
+  .seq-item .stxt em{font-style:normal;color:var(--teal);font-weight:600;}
+
+  /* ---------- notes (warn / tip) ---------- */
+  .notes{margin-top:30px;display:flex;flex-direction:column;gap:16px;}
+  .note{border-radius:15px;padding:22px 24px;border:1px solid var(--line);}
+  .note.warn{background:#FBEFE6;border-color:#E9CBA8;}
+  .note.tip{background:#E9F2EE;border-color:#BBDCCF;}
+  .note .nh{
+    display:flex;align-items:center;gap:9px;font-weight:700;font-size:1rem;
+    margin-bottom:6px;
+  }
+  .note.warn .nh{color:#A8551F;}
+  .note.tip .nh{color:var(--teal-deep);}
+  .note ul{margin:10px 0 0;padding-left:0;list-style:none;}
+  .note li{position:relative;padding-left:20px;margin-bottom:14px;font-size:.96rem;line-height:1.7;}
+  .note li:last-child{margin-bottom:0;}
+  .note li::before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;}
+  .note.warn li::before{background:#C56A2B;}
+  .note.tip li::before{background:var(--teal);}
+  .note li b{color:var(--ink);font-weight:600;}
+
+  /* ---------- closing ---------- */
+  .close{
+    margin:80px 0 0;padding:48px 0 70px;border-top:1px solid var(--line);
+    text-align:center;
+  }
+  .close .ce{font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal);}
+  .close p{font-size:1.32rem;line-height:1.5;color:var(--ink);font-weight:500;max-width:24ch;margin:18px auto 0;font-family:var(--font-display);}
+  .close p b{color:var(--ember);font-weight:700;}
+  .sig{margin-top:30px;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.1em;}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:560px){
+    body{font-size:16px;}
+    .wrap{padding:0 20px;}
+    .chips{grid-template-columns:1fr;}
+    .grid2{grid-template-columns:1fr;}
+    .sechead{gap:13px;}
+    .secnum{width:32px;height:32px;flex-basis:32px;font-size:12px;}
+    .sub{margin-left:45px;}
+    .mech{grid-template-columns:34px 1fr;gap:12px;}
+    .insight,.keystone{padding:24px 22px;}
+    .keystone .ks-text{font-size:1.14rem;}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .loop-arc-anim{animation:none;stroke-dashoffset:0;}
+    .node-engine.glow{animation:none;}
+    .reveal{transition:none;opacity:1;transform:none;}
+    *{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="docbar">
+    <div class="wrap">
+      <span>个人系统 · 操作手册</span>
+      <span><b>v1.0</b> · 为你而写</span>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">诊断 · 从哪里开始</div>
+      <h1>别想着<br><em>「逐个解决」</em></h1>
+      <p class="lead">决策慢、执行弱的人，最危险的动作就是给自己设计一个四线作战的庞大计划——然后两周内全线崩盘。<strong>正确打法不是逐个攻克，而是找到杠杆点：先修一个东西，并让修它的过程顺带改善其他几个。</strong></p>
+
+      <div class="chips reveal">
+        <div class="chip engine"><div class="tag">引擎 · 核心</div><div class="name">做决策的优柔寡断</div></div>
+        <div class="chip engine"><div class="tag">引擎 · 核心</div><div class="name">行动力极低</div></div>
+        <div class="chip down"><div class="tag">下游 · 装系统</div><div class="name">没有节约的概念</div></div>
+        <div class="chip down"><div class="tag">支线 · 融入日常</div><div class="name">表达能力弱</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="wrap">
+      <div class="sechead reveal">
+        <div class="secnum">01</div>
+        <h2>重构问题</h2>
+      </div>
+      <p class="sub reveal">这四个不是并列关系。把它们摊开看，在系统里的位置完全不同。</p>
+
+      <div class="grid2 reveal">
+        <div class="rcard engine">
+          <span class="rtag"><span class="dot"></span>引擎</span>
+          <h3>优柔寡断</h3>
+          <div class="ess">本质：决策回路卡在「决定」这一步。</div>
+          <div class="pos">位置 — <b>引擎（核心）</b></div>
+        </div>
+        <div class="rcard engine">
+          <span class="rtag"><span class="dot"></span>引擎</span>
+          <h3>行动力极低</h3>
+          <div class="ess">本质：同一个回路卡在「行动」这一步。</div>
+          <div class="pos">位置 — <b>引擎（核心）</b></div>
+        </div>
+        <div class="rcard down">
+          <span class="rtag"><span class="dot"></span>下游</span>
+          <h3>没有节约的概念</h3>
+          <div class="ess">本质：缺一套默认规则 / 系统，不是缺意志力。</div>
+          <div class="pos">位置 — <b>下游（引擎修好后装系统即可）</b></div>
+        </div>
+        <div class="rcard down">
+          <span class="rtag"><span class="dot"></span>支线</span>
+          <h3>表达能力弱</h3>
+          <div class="ess">本质：一项可练的手艺。</div>
+          <div class="pos">位置 — <b>支线（让它成为每日行动的内容，不单开战线）</b></div>
+        </div>
+      </div>
+
+      <div class="insight reveal">
+        <div class="k">关键洞察</div>
+        <p>优柔寡断和行动力低，是<span class="em">同一个回路</span>（决定 → 行动 → 观察 → 调整）的<span class="em">两个卡点</span>，不是两个毛病。当回路被卡住，看上去就像两种缺陷；修通这一个回路，两者同时松动。</p>
+      </div>
+
+      <div class="loopwrap reveal">
+        <div class="cap">决策—行动回路</div>
+        <svg class="loopsvg" viewBox="0 0 400 400" role="img" aria-label="决定、行动、观察、调整组成的循环，决定与行动是两个卡点">
+          <!-- track -->
+          <circle class="loop-track" cx="200" cy="200" r="130"/>
+          <path class="loop-arc-anim" d="M200,70 A130,130 0 1,1 199.9,70"/>
+
+          <!-- direction arrows (clockwise: top->right->bottom->left) -->
+          <polygon class="arrow" points="-7,-7 8,0 -7,7" transform="translate(292,108) rotate(45)"/>
+          <polygon class="arrow" points="-7,-7 8,0 -7,7" transform="translate(292,292) rotate(135)"/>
+          <polygon class="arrow" points="-7,-7 8,0 -7,7" transform="translate(108,292) rotate(225)"/>
+          <polygon class="arrow" points="-7,-7 8,0 -7,7" transform="translate(108,108) rotate(315)"/>
+
+          <!-- center principle -->
+          <text class="center-q" x="200" y="194">可逆？</text>
+          <text class="center-s" x="200" y="218">七成就拍板</text>
+
+          <!-- nodes -->
+          <!-- 决定 (engine) -->
+          <circle class="node-engine glow" cx="200" cy="70" r="40"/>
+          <text class="node-label eng" x="200" y="70">决定</text>
+          <text class="stuck-tag" x="200" y="18" text-anchor="middle">↑ 优柔寡断卡在这</text>
+
+          <!-- 行动 (engine) -->
+          <circle class="node-engine glow" cx="330" cy="200" r="40"/>
+          <text class="node-label eng" x="330" y="200">行动</text>
+          <text class="stuck-tag" x="330" y="258" text-anchor="middle">行动力低卡在这</text>
+
+          <!-- 观察 (teal) -->
+          <circle class="node-stage" cx="200" cy="330" r="40"/>
+          <text class="node-label" x="200" y="330">观察</text>
+
+          <!-- 调整 (teal) -->
+          <circle class="node-stage" cx="70" cy="200" r="40"/>
+          <text class="node-label" x="70" y="200">调整</text>
+
+          <!-- traveling dot -->
+          <circle class="travel" r="5">
+            <animateMotion dur="6s" repeatCount="indefinite"
+              path="M200,70 A130,130 0 1,1 200,330 A130,130 0 1,1 200,70"/>
+          </circle>
+        </svg>
+
+        <p class="loop-note"><strong style="color:var(--ink)">底层原理：</strong>绝大多数决策是<span class="hl-teal">可逆的</span>（贝索斯的「两扇门 / Type 2 决策」）。可逆决策的最优解是<span class="hl-ember">信息到七成就拍板</span>——拖延的成本 &gt; 犯错的成本，因为错了能改。优柔寡断的根源，就是把可逆的小决策当成不可逆的大决策在反复纠结。</p>
+        <p class="loop-note">而行动力低是它的下游：<span class="hl-teal">当每个决策被切小、且可逆，行动成本就趋近于零，人自然就动了。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="wrap">
+      <div class="sechead reveal">
+        <div class="secnum">02</div>
+        <h2>从哪里开始</h2>
+      </div>
+      <p class="sub reveal">不要做计划。只装一个 keystone 动作——每天 10–15 分钟、几乎不可能失败。</p>
+
+      <div class="keystone reveal">
+        <div class="ks-ey">每日唯一动作</div>
+        <p class="ks-text">每天挑一件你一直在拖 / 在纠结的小事，用<b>「如果—就」</b>句式锁死，<b>当天做掉</b>，并用一句话说清：我做了什么、为什么。</p>
+      </div>
+
+      <div class="mechs reveal">
+        <div class="mech">
+          <div class="mn">01</div>
+          <div>
+            <div class="mt">if-then 执行意图 <span>Gollwitzer</span></div>
+            <div class="md">把「我要整理资料」改写成「今晚 8 点我一打开电脑，<em>就</em>先建一个文件夹」。这一步把"当下要不要做"的<em>临场决策提前消化掉</em>了——而临场决策正是优柔寡断卡死行动的地方。它是闭合"想做 vs 做到"差距最强的单一技术。</div>
+          </div>
+        </div>
+        <div class="mech">
+          <div class="mn">02</div>
+          <div>
+            <div class="mt">两扇门 + 70% 规则</div>
+            <div class="md">动手前只问一句「<em>这个决定可逆吗？</em>」可逆（绝大多数都是）就给自己一个硬时限，X 分钟内必须拍板。斯多葛的说法指向同一点：你能控制的是动作和判断，不是结果；为结果纠结到瘫痪，是把注意力放错了地方。</div>
+          </div>
+        </div>
+        <div class="mech">
+          <div class="mn">03</div>
+          <div>
+            <div class="mt">双重用途</div>
+            <div class="md">那件做掉的小事，结尾必须用一句话讲清楚。这一句话就是表达练习。于是 <em>行动 rep = 表达 rep</em>，两件事合成一件，不占额外精力。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric reveal">
+        <div class="mlab">衡量标准</div>
+        <p><b>不看结果，只数「今天这个回路转了没有」。</b>连续转三到四周，让它变成默认动作再说。</p>
+        <p class="fine">别信「21 天成习惯」那种说法，因人而异，实际平均更接近两个月——关键只是别中断。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="wrap">
+      <div class="sechead reveal">
+        <div class="secnum">03</div>
+        <h2>后续顺序</h2>
+      </div>
+      <p class="sub reveal">引擎跑顺后，一次只加一个。下面两项有先后——先节约，再升级表达。</p>
+
+      <div class="seq reveal">
+        <div class="seq-item">
+          <div class="sh">
+            <span class="sn">NEXT</span>
+            <h3>节约</h3>
+            <span class="skicker">— 本质是装系统，几乎不靠意志力</span>
+          </div>
+          <ol>
+            <li><b>自动化</b>：发薪日自动转一笔到单独账户，看不见就花不掉。</li>
+            <li><b>一条默认规则</b>：非必要、超过 X 元的消费强制等 24 小时——顺带还在练"延迟决策"。</li>
+            <li><b>一个一眼能看到的支出记录</b>。</li>
+          </ol>
+        </div>
+        <div class="seq-item">
+          <div class="sh">
+            <span class="sn">THEN</span>
+            <h3>表达进阶</h3>
+            <span class="skicker">— 你前两阶段已经在练「一句话讲清」</span>
+          </div>
+          <p class="stxt">这阶段升级为<em>结构化输出</em>：用 PREP（观点-理由-例子-观点）或 SCQA（情境-冲突-问题-答案，金字塔原理）先搭骨架再说 / 写。表达只在两件事上长进：<em>大量反复 + 即时反馈</em>。真人反馈最好——需要的话，我可以当你的反馈环：你写一段，我专挑结构问题。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- notes -->
+  <section>
+    <div class="wrap">
+      <div class="notes reveal">
+        <div class="note warn">
+          <div class="nh">⚠️ 需要注意</div>
+          <ul>
+            <li><b>最大的坑：把"解决弱点"本身变成一个精致项目去优化。</b>对分析型、喜欢搭系统的人，做计划、调模板、建流程会带来强烈的"我在进步"的错觉，但它只挠到了规划的痒处，永远不发车。判断标准只有一条：本周你<b>做掉</b>了几件事，而不是<b>规划</b>了几件事。</li>
+            <li><b>别用身份标签打自己。</b>不是"我是个优柔寡断的人"（身份，固定、让你瘫痪），而是"我的决策回路偏慢"（机制，可改、给你抓手）。这个转换本身就符合斯多葛 / CBT 的思路。</li>
+          </ul>
+        </div>
+        <div class="note tip">
+          <div class="nh">💡 补充</div>
+          <ul>
+            <li><b>"没有节约的概念"可能是价值观问题，不是能力问题。</b>如果你内心其实认同"钱该花在体验和自我投资上"，那它就是一种选择，不是弱点，别硬掰。先问自己：不存钱，有没有在某个具体时刻让我真的受损或焦虑过？有，才值得改。</li>
+            <li><b>"表达能力弱"具体指哪一种？</b>当众讲 / 书面结构 / 即兴回应 / 把复杂讲简单——这四种练法完全不同。你告诉我是哪一种，我能给到更精准的练习设计。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="close">
+    <div class="wrap">
+      <div class="ce reveal">现在就启动</div>
+      <p class="reveal">挑出今天一直在拖的那件小事，写成一句可执行的 <b>「如果—就」</b>。回路转起来，比什么都重要。</p>
+      <div class="sig reveal">决定 → 行动 → 观察 → 调整 → 决定 → …</div>
+    </div>
+  </footer>
+
+<script>
+  // reduced-motion: stop SMIL + glow
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){
+    document.querySelectorAll('animateMotion').forEach(a=>a.remove());
+    document.querySelectorAll('.travel').forEach(t=>t.remove());
+  }
+
+  // scroll reveal
+  const els = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !reduce){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    },{threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+    els.forEach(el=>io.observe(el));
+  } else {
+    els.forEach(el=>el.classList.add('in'));
+  }
+</script>
+</body>
+</html>
