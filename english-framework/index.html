@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语进阶 · 学习框架</title>
+<style>
+  :root{
+    --bg:#f7f3ec; --card:#fffdf9; --ink:#2b2622; --sub:#7a7167;
+    --line:#e7ddd0; --accent:#c8763e; --accent2:#3e7d6b; --soft:#f0e7da;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;line-height:1.7;padding:48px 20px 80px}
+  .wrap{max-width:880px;margin:0 auto}
+  header{text-align:center;margin-bottom:48px}
+  header .kicker{letter-spacing:.3em;font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase}
+  header h1{font-size:38px;margin:10px 0 8px;font-weight:800;letter-spacing:-.5px}
+  header p{color:var(--sub);font-size:15px}
+  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:28px 0 8px}
+  .pillar{background:var(--soft);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--sub)}
+  .pillar b{display:block;color:var(--ink);font-size:15px;margin-bottom:3px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 30px;margin:22px 0;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .num{font-size:13px;font-weight:800;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 26px}
+  h2{font-size:22px;font-weight:800;letter-spacing:-.3px}
+  .tag{font-size:12px;color:var(--sub);margin-left:auto;background:var(--soft);padding:3px 10px;border-radius:20px}
+  .lead{color:var(--sub);font-size:14px;margin:4px 0 16px}
+  ul{list-style:none;display:grid;gap:11px}
+  li{position:relative;padding-left:22px;font-size:15px}
+  li::before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;border-radius:50%;background:var(--accent2)}
+  li b{color:var(--ink)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .split h3{font-size:15px;margin-bottom:10px;color:var(--accent2);font-weight:800}
+  .key{background:var(--soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:12px 16px;font-size:14px;margin-top:14px}
+  .key b{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--sub);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  td:first-child{font-weight:700;width:90px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .pill-row span{background:var(--soft);border-radius:20px;padding:5px 13px;font-size:13px}
+  .ebb{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .ebb span{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600}
+  .ebb span small{color:var(--sub);font-weight:400;display:block;font-size:11px}
+  footer{text-align:center;color:var(--sub);font-size:13px;margin-top:40px}
+  @media(max-width:640px){.split{grid-template-columns:1fr}header h1{font-size:30px}section{padding:22px 20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">English Level-up · 学习框架</div>
+    <h1>英语进阶 · 可执行框架</h1>
+    <p>把语言当作自然习得的过程 —— 不是为考试，是为打开更大的世界</p>
+    <div class="pillars">
+      <div class="pillar"><b>主动 &gt; 被动</b>做/教/模拟记住 ~90%，只听只读 ~10–20%</div>
+      <div class="pillar"><b>兴趣驱动</b>把英语接到你真正喜欢的事上（游戏/技术/影音）</div>
+      <div class="pillar"><b>融入日常</b>像刷牙一样，成为背景习惯而非额外任务</div>
+      <div class="pillar"><b>先输出再纠错</b>自己先说先写，再让 AI / 他人修正</div>
+    </div>
+  </header>
+
+  <!-- 1 认知 -->
+  <section>
+    <div class="sec-head"><span class="num">0</span><h2>认知 · 先把地基打对</h2><span class="tag">心法</span></div>
+    <ul>
+      <li><b>想清楚动机：</b>为什么学？五年后想要什么样的生活？内在动机比外部压力更耐用。</li>
+      <li><b>目标对齐自己的水平</b>，别跟天才比 —— 比较只会带来持续的自我否定。</li>
+      <li><b>系统化、抓弱项：</b>找出具体薄弱环节集中发力，并留出复习与反思时间，而不是平均用力。</li>
+      <li><b>"不想学"是信号</b>，不是道德问题 —— 是累了 / 太难 / 太无聊。调整条件，别自责。</li>
+      <li><b>给自己一个允许犯错的环境</b>，像婴儿学说话一样，需要不被嘲笑的练习空间。</li>
+      <li><b>别熬夜换学习时间</b>，睡眠不足反而拉低认知效率，得不偿失。</li>
+    </ul>
+  </section>
+
+  <!-- 2 单词 -->
+  <section>
+    <div class="sec-head"><span class="num">1</span><h2>单词</h2><span class="tag">输入地基</span></div>
+    <p class="lead">把单词当作语言系统中的"对象"，而不是"单词＝翻译"的孤立配对。识别词根词缀与派生，是方法而非死记。</p>
+    <div class="split">
+      <div>
+        <h3>两条策略（按阶段选）</h3>
+        <ul>
+          <li><b>每日小量精记：</b>如 40 词/天，用碎片时间（通勤、睡前），心理负担低，打核心词地基。</li>
+          <li><b>大量泛刷：</b>每天 100+ 词、降低单次记忆预期，用数量补质量。适合 1000–7000 词区间冲量。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>记忆技巧</h3>
+        <ul>
+          <li><b>语境关联：</b>记搭配、造句、例句，而非单词本身。</li>
+          <li><b>出声读 + 抽象想象</b>（自己脑中画面，而非某张具体图片）。</li>
+          <li><b>符号标注：</b>三角=有趣、耳朵=发音要注意。</li>
+          <li><b>挂在你在乎的领域</b>（编程 / 关系 / 兴趣）上记。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="key"><b>艾宾浩斯 8 段复习</b>，14 天一轮把词转为长期记忆：</div>
+    <div class="ebb">
+      <span>5 分钟<small>初学后</small></span>
+      <span>30 分钟<small>第一次复习</small></span>
+      <span>12 小时<small>睡前</small></span>
+      <span>1 天</span><span>2 天</span><span>4 天</span><span>7 天</span><span>15 天</span>
+    </div>
+    <div class="key">维护一个<b>跨设备云生词本</b>：随手汇集生词、随时复习、标记难词/发音词、记熟的删掉，只留还没拿下的。</div>
+  </section>
+
+  <!-- 3 听力 -->
+  <section>
+    <div class="sec-head"><span class="num">2</span><h2>听力</h2><span class="tag">精听 + 泛听</span></div>
+    <div class="split">
+      <div>
+        <h3>精听（练准）</h3>
+        <ul>
+          <li><b>反复听一段</b>直到能听懂、记住、复述 —— 甚至能拼写整段。</li>
+          <li><b>抠到每个词</b>：掌握发音、连读、节奏。</li>
+          <li><b>定位弱点</b>做针对性训练。</li>
+          <li>配合<b>听写 / 跟读复述</b>落地。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>泛听（养语感）</h3>
+        <ul>
+          <li>有声书、影视、音乐、直播大量自然输入。</li>
+          <li><b>重看爱看的内容时关字幕</b>，靠记忆补全来提升听力。</li>
+          <li>听歌要"有意识地听歌词"，而非背景音。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="key"><b>最大误区：</b>过度盯单个词。要听<b>整句的意思</b> —— 词连在一起会变音，意思随语境改变。</div>
+  </section>
+
+  <!-- 4 阅读 -->
+  <section>
+    <div class="sec-head"><span class="num">3</span><h2>阅读</h2><span class="tag">精读 + 泛读</span></div>
+    <div class="split">
+      <div>
+        <h3>精读（短而精的好文）</h3>
+        <ul>
+          <li>查词典、反复读、分析作者意图。</li>
+          <li>慢而刻意，体会好文笔。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>泛读（文笔优美的长篇）</h3>
+        <ul>
+          <li>以享受为先，不赶进度不强排计划。</li>
+          <li>跟着兴趣自然推进。</li>
+        </ul>
+      </div>
+    </div>
+    <ul style="margin-top:16px">
+      <li><b>生词处理：</b>同一段累计到 5 个以上生词就停下先攻克 —— 这些词会严重影响后续章节理解。逐个记录查证。</li>
+      <li><b>选材分级：</b>由易到难循序渐进，匹配当前水平，避免被劝退。可先看中译建立背景。</li>
+      <li>技术文档可在开读前<b>先批量过滤/ 预查生词</b>。</li>
+    </ul>
+  </section>
+
+  <!-- 5 口语 -->
+  <section>
+    <div class="sec-head"><span class="num">4</span><h2>口语</h2><span class="tag">输出</span></div>
+    <ul>
+      <li><b>发音打底：</b>系统学元音辅音，没有捷径；用熟悉的中文音/表达做类比参照。</li>
+      <li><b>大声练 &gt; 默念：</b>先认真听，再大声朗读求清晰，最后才模仿自然语流。</li>
+      <li><b>备好高频话题：</b>自我介绍、家乡、近况、开心的事、难忘经历、对某产品的看法 —— 反复练到张口即来。</li>
+      <li><b>绕过"心里翻译"：</b>靠大量泛听训练大脑形成条件反射，由语境直接触发表达，而非逐词搜索。</li>
+      <li>用<b>唱英文歌</b>记词、用<b>跟陌生人对话</b>建立自信和实战感。</li>
+    </ul>
+  </section>
+
+  <!-- 6 写作 -->
+  <section>
+    <div class="sec-head"><span class="num">5</span><h2>写作</h2><span class="tag">输出</span></div>
+    <ul>
+      <li><b>广博而精选地读：</b>研究不同文体风格，挑对齐你目标的材料，批判性分析作者的观点与技法。</li>
+      <li><b>有目的地练：</b>选匹配水平的题目写，写完批判性复盘，找出强项与弱项。</li>
+      <li><b>主动而真诚地求反馈：</b>把作品给别人看、要批评；给和收都同等重要。</li>
+      <li><b>用 AI 做修订参考</b>识别问题、给改写建议 —— 是参照，不是替你判断。</li>
+      <li>在<b>创新与传统、规范与突破之间</b>找平衡，发展自己的声音；拒绝标题党，真实优先。</li>
+    </ul>
+  </section>
+
+  <!-- 7 AI -->
+  <section>
+    <div class="sec-head"><span class="num">6</span><h2>AI 私教工作流（2026）</h2><span class="tag">把四项打成训练闭环</span></div>
+    <p class="lead">核心：把 AI 配成"会带节奏、会出题、会纠错、会追问"的私教。铁律 —— <b>你先说/先写，AI 再纠正</b>；效果来自持续反馈闭环，不是偶尔一问。</p>
+    <div class="split">
+      <div>
+        <h3>说</h3>
+        <ul>
+          <li>语音对话，要求 AI 只在必要时打断；多让你输出、它少说。</li>
+          <li>会议 / 面试模拟，一次只问一个问题。</li>
+        </ul>
+        <h3 style="margin-top:14px">听</h3>
+        <ul>
+          <li>把转录稿变成测验（5 道理解 + 5 道推断）。</li>
+          <li>生成高频词/搭配/句型闪卡；做分块听写对照原文。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>读</h3>
+        <ul>
+          <li>逐段引导而不直接全翻；抽 10 个可复用表达（含语域、搭配、填空）。</li>
+          <li>你来总结，AI 按准确/清晰/词汇打分（0–10）。</li>
+        </ul>
+        <h3 style="margin-top:14px">写</h3>
+        <ul>
+          <li>AI 只指出最关键 3–5 个问题，你先改。</li>
+          <li>邮件三版（礼貌/简洁/直接）；作文按评分标准给分 + 抽 5 个可复用表达。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="key"><b>词汇 / 语法：</b>近义词对比练搭配；针对你反复犯的错做"微课"；标记有用表达 → 3 天后测 → 在新语境复用。优先吃<b>高频搭配、句型骨架、常见语气</b>。</div>
+
+    <h3 style="margin:20px 0 4px;color:var(--accent2);font-size:15px">最小可执行周表</h3>
+    <table>
+      <tr><th>日</th><th>动作</th><th>时长</th></tr>
+      <tr><td>周一</td><td>口语教练 + 把纠正重说一遍</td><td>25 min</td></tr>
+      <tr><td>周二</td><td>短文精读 + 抽 5–10 个表达</td><td>30 min</td></tr>
+      <tr><td>周三</td><td>话题口语 / 面试模拟</td><td>20 min</td></tr>
+      <tr><td>周四</td><td>用前几天素材做测验 / 闪卡</td><td>20 min</td></tr>
+      <tr><td>周五</td><td>邮件 / 总结 / 作文 + 两轮修订</td><td>30 min</td></tr>
+      <tr><td>周末</td><td>本周错题复盘 + 巩固</td><td>30 min</td></tr>
+    </table>
+  </section>
+
+  <!-- 整合路线 -->
+  <section style="background:linear-gradient(135deg,#2b2622,#3a322b);color:#f3ece1;border:none">
+    <div class="sec-head"><h2 style="color:#fff">把它串成一条线</h2></div>
+    <ul style="color:#e7ddd0">
+      <li style="--x:1"><b style="color:#f3b27a">动机先行</b> → 想清为什么，挂到真实兴趣上。</li>
+      <li><b style="color:#f3b27a">地基</b> → 单词（云生词本 + 艾宾浩斯）＋ 发音音标，每天碎片化推进。</li>
+      <li><b style="color:#f3b27a">大输入</b> → 精听抠细节、泛听养语感；精读练深度、泛读养兴趣。生词≥5 先攻克。</li>
+      <li><b style="color:#f3b27a">逼输出</b> → 备高频话题大声说、有目的地写，绕过心里翻译。</li>
+      <li><b style="color:#f3b27a">闭环</b> → 自己先做 → AI/他人纠错 → 抽可复用表达 → 隔几天复用。每周复盘错题。</li>
+    </ul>
+    <div style="margin-top:14px;font-size:13px;color:#b8ad9e;border-top:1px solid rgba(255,255,255,.12);padding-top:12px">
+      口诀：<b style="color:#f3b27a">兴趣驱动 · 主动输出 · 语境记忆 · 间隔复习 · 持续闭环</b>
+    </div>
+  </section>
+
+  <footer>方法提炼自开源项目 English-level-up-tips（英语进阶指南）· 仅留可执行框架，资源请自行翻阅原站</footer>
+</div>
+</body>
+</html>
