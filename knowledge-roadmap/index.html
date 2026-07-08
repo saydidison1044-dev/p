@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>底层知识学习路线 · 私人地图</title>
+<style>
+  :root{
+    --paper:#faf6ee;
+    --card:#fffdf8;
+    --ink:#2b2620;
+    --ink-soft:#6b6257;
+    --ink-faint:#a39884;
+    --accent:#bf4034;
+    --accent-soft:#f3ddd9;
+    --gold:#9a7b2d;
+    --line:#e6dcc8;
+    --done:#3e7a52;
+    --done-soft:#e2efe6;
+    --serif:"Songti SC","Noto Serif SC","STSong",serif;
+    --sans:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.75;
+    background-image:radial-gradient(circle at 15% 10%, rgba(191,64,52,.04), transparent 40%),
+                     radial-gradient(circle at 85% 90%, rgba(154,123,45,.05), transparent 45%);}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 22px 80px;}
+
+  /* ---------- 头部 ---------- */
+  header{text-align:center;margin-bottom:18px;}
+  .kicker{font-size:13px;letter-spacing:.5em;color:var(--accent);text-indent:.5em;margin-bottom:14px;}
+  h1{font-family:var(--serif);font-size:clamp(30px,6vw,46px);font-weight:900;letter-spacing:.08em;line-height:1.3;}
+  .sub{color:var(--ink-soft);font-size:15px;margin-top:12px;}
+  .formula{display:inline-block;margin-top:22px;padding:14px 26px;border:1.5px solid var(--ink);
+    background:var(--card);font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.1em;
+    box-shadow:4px 4px 0 var(--accent-soft);}
+  .formula span{color:var(--accent);}
+
+  /* ---------- 当前位置 ---------- */
+  .status{margin:36px 0 8px;background:var(--ink);color:var(--paper);padding:22px 26px;border-radius:4px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between;}
+  .status .where{font-family:var(--serif);font-size:18px;font-weight:700;letter-spacing:.05em;}
+  .status .where em{color:#f0c75e;font-style:normal;}
+  .bar-area{flex:1;min-width:220px;}
+  .bar{height:8px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#e0a23e,#bf4034);border-radius:99px;transition:width .5s ease;}
+  .bar-label{font-size:12px;color:rgba(255,255,255,.65);margin-top:6px;letter-spacing:.05em;}
+  .hint{font-size:12.5px;color:var(--ink-faint);text-align:right;margin:8px 4px 0;}
+
+  /* ---------- 时间线 ---------- */
+  .timeline{position:relative;margin-top:34px;}
+  .timeline::before{content:"";position:absolute;left:25px;top:10px;bottom:10px;width:2px;
+    background:repeating-linear-gradient(to bottom,var(--ink-faint) 0 6px,transparent 6px 12px);opacity:.5;}
+  .stage{position:relative;padding-left:72px;margin-bottom:34px;}
+  .node{position:absolute;left:0;top:2px;width:52px;height:52px;border-radius:50%;
+    background:var(--card);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:21px;font-weight:900;z-index:1;}
+  .stage.done .node{background:var(--done);border-color:var(--done);color:#fff;font-size:24px;}
+  .stage.current .node{background:var(--accent);border-color:var(--accent);color:#fff;
+    box-shadow:0 0 0 6px var(--accent-soft);}
+
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:6px;padding:24px 26px;
+    box-shadow:0 1px 3px rgba(60,50,30,.06);transition:border-color .3s;}
+  .stage.current .card{border-color:var(--accent);box-shadow:5px 5px 0 var(--accent-soft);}
+  .stage.done .card{border-color:#cfdfd4;background:linear-gradient(var(--done-soft) 0,var(--card) 90px);}
+
+  .stage-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .stage-month{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.15em;border:1px solid var(--gold);
+    padding:2px 10px;border-radius:99px;}
+  .here{font-size:12px;font-weight:700;color:#fff;background:var(--accent);padding:2px 10px;border-radius:99px;
+    letter-spacing:.1em;display:none;}
+  .stage.current .here{display:inline-block;}
+  .done-tag{font-size:12px;font-weight:700;color:#fff;background:var(--done);padding:2px 10px;border-radius:99px;
+    letter-spacing:.1em;display:none;}
+  .stage.done .done-tag{display:inline-block;}
+  h2{font-family:var(--serif);font-size:23px;font-weight:900;margin-top:10px;letter-spacing:.04em;}
+  .solve{margin-top:6px;color:var(--ink-soft);font-size:14.5px;}
+  .solve b{color:var(--accent);font-weight:700;}
+
+  .models{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{font-size:12.5px;padding:3px 12px;border-radius:99px;background:var(--paper);border:1px solid var(--line);
+    color:var(--ink-soft);letter-spacing:.03em;}
+
+  .books{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px;}
+  .group-label{font-size:11.5px;font-weight:700;letter-spacing:.25em;color:var(--ink-faint);margin:6px 10px 2px;}
+  .book{display:flex;align-items:flex-start;gap:12px;padding:9px 10px;border-radius:6px;cursor:pointer;}
+  .book:hover{background:var(--paper);}
+  .book input{display:none;}
+  .box{flex:none;width:21px;height:21px;margin-top:4px;border:2px solid var(--ink-faint);border-radius:4px;
+    display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:all .2s;}
+  .book input:checked + .box{background:var(--done);border-color:var(--done);}
+  .box::after{content:"✓";opacity:0;}
+  .book input:checked + .box::after{opacity:1;}
+  .binfo{flex:1;}
+  .btitle{font-size:16px;font-weight:700;font-family:var(--serif);letter-spacing:.02em;}
+  .book input:checked ~ .binfo .btitle{color:var(--ink-faint);text-decoration:line-through;text-decoration-thickness:1px;}
+  .bauthor{font-size:12.5px;color:var(--ink-faint);margin-left:8px;font-family:var(--sans);font-weight:400;}
+  .bwhy{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .badge{font-size:11px;font-weight:700;padding:1px 8px;border-radius:3px;margin-right:8px;vertical-align:2px;letter-spacing:.1em;}
+  .badge.main{background:var(--accent);color:#fff;}
+  .badge.plus{background:none;border:1px solid var(--ink-faint);color:var(--ink-faint);}
+
+  .extra{margin-top:16px;display:grid;gap:10px;}
+  @media(min-width:640px){.extra{grid-template-columns:1fr 1fr;}}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 16px;font-size:13px;color:var(--ink-soft);}
+  .panel b{display:block;font-size:12px;letter-spacing:.2em;color:var(--gold);margin-bottom:5px;}
+  .panel.task b{color:var(--accent);}
+  .panel li{margin-left:18px;}
+
+  /* ---------- 终点 & 军规 ---------- */
+  .finale{position:relative;padding-left:72px;}
+  .finale .node{background:var(--ink);color:var(--paper);border-color:var(--ink);font-size:18px;}
+  .finale .card{border-style:dashed;}
+
+  .rules{margin-top:56px;}
+  .rules-title{font-family:var(--serif);font-size:21px;font-weight:900;text-align:center;letter-spacing:.3em;text-indent:.3em;}
+  .rules-grid{margin-top:22px;display:grid;gap:14px;}
+  @media(min-width:640px){.rules-grid{grid-template-columns:repeat(3,1fr);}}
+  .rule{background:var(--card);border:1.5px solid var(--line);border-top:4px solid var(--accent);border-radius:6px;padding:18px;}
+  .rule h3{font-family:var(--serif);font-size:16px;margin-bottom:8px;}
+  .rule p{font-size:13px;color:var(--ink-soft);}
+
+  footer{margin-top:54px;text-align:center;color:var(--ink-faint);font-size:12.5px;line-height:2;}
+  footer .seal{display:inline-block;font-family:var(--serif);border:2px solid var(--accent);color:var(--accent);
+    padding:6px 14px;font-weight:900;letter-spacing:.2em;text-indent:.2em;margin-bottom:14px;transform:rotate(-3deg);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">十四周 · 二十九本书 · 一张地图</div>
+    <h1>底层知识学习路线</h1>
+    <div class="sub">源自你 Reader 收藏的《底层只是推荐》——按「世界 → 人 → 社会 → 思维」四层推进。<br>
+    按你 NotebookLM 一两天一本的速度排期：<b>主读是该类型公认最好的书，必看；进阶按兴趣刷。</b>勾完一个阶段的主读，就算过关。</div>
+    <div class="formula">底层知识 = 解释力 <span>×</span> 迁移性 <span>×</span> 半衰期</div>
+  </header>
+
+  <div class="status">
+    <div class="where" id="whereText">你现在的位置：—</div>
+    <div class="bar-area">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="bar-label" id="barLabel">已读 0 本</div>
+    </div>
+  </div>
+  <div class="hint">进度保存在这台电脑的浏览器里，关掉再开还在。读完一本就点一下。</div>
+
+  <div class="timeline">
+
+    <!-- 阶段 0 -->
+    <section class="stage" data-stage="0">
+      <div class="node">壹</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 1 – 2 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>装上总览：什么是思维模型</h2>
+        <div class="solve">解决的问题：<b>先看见整张地图</b>，知道「多元思维模型」到底是什么，后面每本书都有地方挂。</div>
+        <div class="models">
+          <span class="chip">思维模型格栅</span><span class="chip">激励</span><span class="chip">能力圈</span><span class="chip">杠杆</span><span class="chip">反过来想</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s0-munger" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>穷查理宝典<span class="bauthor">查理·芒格</span></span>
+            <span class="bwhy">「多元思维模型」这个概念的原产地，那篇文章的思想源头。这一类无可争议的第一本。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s0-naval" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>纳瓦尔宝典<span class="bauthor">埃里克·乔根森</span></span>
+            <span class="bwhy">芒格模型的当代赚钱版：杠杆、复利、判断力。很薄，一天能过完。你库里存的「纳瓦尔体系」就是它的预告片。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s0-super"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>超级思维<span class="bauthor">加布里埃尔·温伯格</span></span>
+            <span class="bwhy">300 个思维模型的速查词典，不用通读，放手边当工具书。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s0-page"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>模型思维<span class="bauthor">斯科特·佩奇</span></span>
+            <span class="bwhy">学术硬核版，几十个模型逐个推演。想知道模型「为什么成立」再读。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>用「激励」模型分析身边一件事：他为什么这么干？看他的激励结构，别听他说的理由。</div>
+          <div class="panel"><b>你库里的存货</b><li>《底层只是推荐》（本路线的母文章）</li><li>纳瓦尔体系：搞钱像呼吸一样自然</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 阶段 1 -->
+    <section class="stage" data-stage="1">
+      <div class="node">贰</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 3 – 4 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>概率思维：世界是不确定的</h2>
+        <div class="solve">解决的问题：<b>不被偶然性骗</b>。文章把它列为优先级第一的地基——随机性、回归均值、贝叶斯更新。</div>
+        <div class="models">
+          <span class="chip">随机性</span><span class="chip">回归均值</span><span class="chip">贝叶斯更新</span><span class="chip">幸存者偏差</span><span class="chip">凸性与反脆弱</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s1-taleb" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>随机漫步的傻瓜<span class="bauthor">塔勒布</span></span>
+            <span class="bwhy">把「运气被当成实力」讲得最透的一本，读完看新闻和成功学的眼神都会变。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s1-bets" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>对赌：信息不足时如何做出高明决策<span class="bauthor">安妮·杜克</span></span>
+            <span class="bwhy">职业牌手写的不确定性决策实操书：把「决策质量」和「结果好坏」分开看，最能落地的一本。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s1-drunkard"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>醉汉的脚步<span class="bauthor">列纳德·蒙洛迪诺</span></span>
+            <span class="bwhy">随机性的科普史，全书都是故事，最轻松的一本，适合 NotebookLM 一天刷完。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s1-swan"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>黑天鹅<span class="bauthor">塔勒布</span></span>
+            <span class="bwhy">极端事件如何主宰世界，对理财决策直接有用。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s1-antifragile"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>反脆弱<span class="bauthor">塔勒布</span></span>
+            <span class="bwhy">塔勒布三部曲的收官：不只防黑天鹅，还要从波动中获益。个人职业规划也适用。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>找一个你最近归因为「实力或失误」的结果，用「运气 + 回归均值」重新解释一遍。</div>
+          <div class="panel"><b>你库里的存货</b><li>复利（Compounding）</li><li>Odds of Building $1M+ Net Worth</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 阶段 2 -->
+    <section class="stage" data-stage="2">
+      <div class="node">叁</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 5 – 7 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>人的决策：激励、偏差与博弈</h2>
+        <div class="solve">解决的问题：<b>看懂人为什么这么干</b>——这一层对你的销售工作直接变现，谈判、成交、定价、识人全在这。</div>
+        <div class="models">
+          <span class="chip">激励结构</span><span class="chip">损失厌恶</span><span class="chip">锚定</span><span class="chip">互惠与承诺</span><span class="chip">机会成本</span><span class="chip">重复博弈</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s2-cialdini" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>影响力<span class="bauthor">罗伯特·西奥迪尼</span></span>
+            <span class="bwhy">说服心理学的第一名，没有之二。你存的那些「话术」帖子背后的原理全在这六个武器里。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s2-kahneman" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>思考，快与慢<span class="bauthor">丹尼尔·卡尼曼</span></span>
+            <span class="bwhy">认知偏差的总源头，诺奖得主亲自写的原典。厚，用 NotebookLM 抓主干正合适。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s2-sowell" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>经济学的思维方式<span class="bauthor">托马斯·索维尔</span></span>
+            <span class="bwhy">零公式的经济学：激励、稀缺、机会成本。看政策和商业新闻从此换一副眼镜。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s2-ariely"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>怪诞行为学<span class="bauthor">丹·艾瑞里</span></span>
+            <span class="bwhy">行为经济学最好读的入门，全是实验故事，《思考，快与慢》的轻量替身。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s2-priceless"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>无价：洞悉大众心理玩转价格游戏<span class="bauthor">威廉·庞德斯通</span></span>
+            <span class="bwhy">价格心理学专著：锚定、对比、定价套路。你存过「高利润生意卖的是心理价值」，这本就是它的全书版。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s2-dixit"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>策略思维<span class="bauthor">迪克西特 / 奈尔伯夫</span></span>
+            <span class="bwhy">博弈论入门最好读的一本：谈判、出价、信任的建立与崩塌。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>下次见客户前，写下你打算用的 3 个影响力武器；谈完复盘哪个真起了作用。</div>
+          <div class="panel"><b>你库里的存货</b><li>人性话术大师</li><li>高利润生意卖的是「心理价值」</li><li>40 条高情商识人术</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 阶段 3 -->
+    <section class="stage" data-stage="3">
+      <div class="node">肆</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 8 – 10 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>社会的运作：利益与权力</h2>
+        <div class="solve">解决的问题：<b>看懂制度、政策、组织背后的牌局</b>——谁受益、谁受损、权力怎么维持。这是你读毛选真正该取的东西：方法论，不是结论。</div>
+        <div class="models">
+          <span class="chip">利益分析 cui bono</span><span class="chip">权力逻辑</span><span class="chip">主要矛盾</span><span class="chip">路径依赖</span><span class="chip">制度与代理问题</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s3-mao" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>毛泽东选集 · 精读四篇<span class="bauthor">毛泽东</span></span>
+            <span class="bwhy">只读四篇：《中国社会各阶级的分析》《实践论》《矛盾论》《反对本本主义》。当社会分析工具箱读，不当历史读。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s3-prince" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>君主论<span class="bauthor">马基雅维利</span></span>
+            <span class="bwhy">权力逻辑的西方原典，很薄。你库里已经存了它的 NotebookLM 解读，配着读。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s3-dictator" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>独裁者手册<span class="bauthor">布鲁诺·德·梅斯奎塔</span></span>
+            <span class="bwhy">现代版权力逻辑：从公司政治到国家治理一套规则通吃，这个类型近二十年最好的一本。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s3-48laws"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>权力的 48 条法则<span class="bauthor">罗伯特·格林</span></span>
+            <span class="bwhy">权术案例库。当「识别手册」读——别人对你用哪条，你要看得出来。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s3-nations"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>国家为什么会失败<span class="bauthor">阿西莫格鲁 / 罗宾逊</span></span>
+            <span class="bwhy">制度如何决定贫富，包容性 vs 攫取性制度。看懂国家层面的「谁受益」。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s3-guns"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>枪炮、病菌与钢铁<span class="bauthor">贾雷德·戴蒙德</span></span>
+            <span class="bwhy">万年尺度的路径依赖：地理如何锁定文明的命运。宏观视角的天花板。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>挑一条最近的政策或公司决定，连问三遍「谁受益、谁受损」，再找它的主要矛盾。</div>
+          <div class="panel"><b>你库里的存货</b><li>君主论：政治权术与建国之道（NotebookLM）</li><li>独裁与资本的共通逻辑</li><li>自律是穷人逻辑</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 阶段 4 -->
+    <section class="stage" data-stage="4">
+      <div class="node">伍</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 11 – 12 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>硬规律：进化与系统</h2>
+        <div class="solve">解决的问题：<b>看懂事物为什么「自己会变成那样」</b>——竞争淘汰、反馈回路、不投入就退化（熵）。</div>
+        <div class="models">
+          <span class="chip">进化选择</span><span class="chip">反馈回路</span><span class="chip">杠杆点</span><span class="chip">规模法则</span><span class="chip">熵增</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s4-dawkins" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>自私的基因<span class="bauthor">理查德·道金斯</span></span>
+            <span class="bwhy">进化论思维的原典：活下来的不一定最优，但一定适应。商业、习惯、组织全适用。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s4-meadows" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>系统之美<span class="bauthor">德内拉·梅多斯</span></span>
+            <span class="bwhy">系统思维公认最好的入门：为什么好心办坏事、为什么治标不治本。你库里已有它的延伸讨论。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s4-scale"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>规模<span class="bauthor">杰弗里·韦斯特</span></span>
+            <span class="bwhy">生物、城市、公司共用一套规模法则：为什么公司会死而城市不死。震撼度很高的一本。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s4-senge"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>第五项修炼<span class="bauthor">彼得·圣吉</span></span>
+            <span class="bwhy">系统思维落到组织与个人成长：心智模式、系统基模。读完会重新理解「为什么努力没用」。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>把你「精力差」或「存不下钱」背后的反馈回路画出来，找到那个杠杆点。</div>
+          <div class="panel"><b>你库里的存货</b><li>《系统之美》观点的同盟与对手</li><li>个人系统杠杆点</li><li>范式：比三观更底层的假设</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 阶段 5 -->
+    <section class="stage" data-stage="5">
+      <div class="node">陆</div>
+      <div class="card">
+        <div class="stage-top">
+          <span class="stage-month">第 13 – 14 周</span>
+          <span class="here">◉ 你在这里</span><span class="done-tag">✓ 已完成</span>
+        </div>
+        <h2>思维本身：元能力收官</h2>
+        <div class="solve">解决的问题：<b>给前面所有模型装上操作系统</b>——识别诡辩、从事实出发推导、把经验固化成自己的原则。</div>
+        <div class="models">
+          <span class="chip">论证有效性</span><span class="chip">第一性原理</span><span class="chip">理性商</span><span class="chip">可信度加权</span><span class="chip">原则化</span>
+        </div>
+        <div class="books">
+          <label class="book"><input type="checkbox" data-book="s5-questions" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>学会提问<span class="bauthor">尼尔·布朗</span></span>
+            <span class="bwhy">批判性思维的实操手册：论题是什么、理由是什么、有什么被偷换了。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s5-dalio" data-core="1"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge main">主读</span>原则<span class="bauthor">瑞·达利欧</span></span>
+            <span class="bwhy">收官之作：示范怎么把三个月学到的模型，固化成你自己的决策原则。你库里存的两篇达利欧帖子是它的预告片。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s5-stanovich"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>超越智商<span class="bauthor">基思·斯坦诺维奇</span></span>
+            <span class="bwhy">聪明人为什么也做蠢事：理性是和智商独立的能力，而且可以练。</span></span>
+          </label>
+          <label class="book"><input type="checkbox" data-book="s5-dobelli"><span class="box"></span>
+            <span class="binfo"><span class="btitle"><span class="badge plus">进阶</span>清醒思考的艺术<span class="bauthor">罗尔夫·多贝里</span></span>
+            <span class="bwhy">52 个思维错误，每篇两页，一天刷完。当全程的复习卡用。</span></span>
+          </label>
+        </div>
+        <div class="extra">
+          <div class="panel task"><b>本阶段实践</b>用第一性原理把你明年最重要的目标从头推一遍：哪些是事实，哪些只是沿袭下来的假设？</div>
+          <div class="panel"><b>你库里的存货</b><li>达利欧人生原则</li><li>了解自己的本性（Ray Dalio）</li><li>学习能力的十个层次</li></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 终点 -->
+    <section class="finale">
+      <div class="node">终</div>
+      <div class="card">
+        <h2 style="font-size:19px;">十四周之后</h2>
+        <div class="solve">14 本主读打完，你手里就有 20 来个反复出现的核心模型——按那篇文章的说法，这已经够覆盖你大部分判断需求。之后不是再找新书单，而是把这套格栅<b>用旧、用顺手</b>：碰到真问题时回来精读对应章节，比再刷十本新书值钱。</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="rules">
+    <div class="rules-title">三 条 军 规</div>
+    <div class="rules-grid">
+      <div class="rule"><h3>快读拿地图，慢用才内化</h3><p>NotebookLM 两天一本拿到的是地图。模型真正长在身上，靠的是每阶段那个实践任务。</p></div>
+      <div class="rule"><h3>别拿单一锤子</h3><p>只会一个模型的人，看什么都像钉子。结论要经得起两三个模型交叉验证。</p></div>
+      <div class="rule"><h3>规律是趋势，不是铁律</h3><p>熵增、马太效应都是统计倾向，个案有反例。别把概率当成预言。</p></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="seal">学而时用之</div><br>
+    每读完一个模型，立刻拿它分析一件你身边的真实事——光读不用，永远是别人的知识。<br>
+    路线源自 Reader 收藏《底层只是推荐》 · 2026 年 6 月制 · 第二版
+  </footer>
+</div>
+
+<script>
+(function(){
+  var KEY = "dixia-roadmap-v1";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) {}
+
+  var boxes = document.querySelectorAll("input[data-book]");
+  var stages = document.querySelectorAll(".stage");
+  var stageNames = ["阶段壹 · 装上总览","阶段贰 · 概率思维","阶段叁 · 人的决策","阶段肆 · 利益与权力","阶段伍 · 进化与系统","阶段陆 · 思维本身"];
+
+  boxes.forEach(function(b){
+    if (state[b.dataset.book]) b.checked = true;
+    b.addEventListener("change", function(){
+      state[b.dataset.book] = b.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    });
+  });
+
+  function render(){
+    var total = boxes.length, read = 0;
+    boxes.forEach(function(b){ if (b.checked) read++; });
+
+    // 阶段完成的标准：该阶段所有「主读」勾完
+    var currentSet = false, currentName = "";
+    stages.forEach(function(s, i){
+      var core = s.querySelectorAll("input[data-core]");
+      var allDone = true;
+      core.forEach(function(b){ if (!b.checked) allDone = false; });
+      s.classList.remove("done","current");
+      if (allDone) { s.classList.add("done"); }
+      else if (!currentSet) { s.classList.add("current"); currentSet = true; currentName = stageNames[i]; }
+    });
+
+    document.getElementById("barFill").style.width = (total ? (read/total*100) : 0) + "%";
+    document.getElementById("barLabel").textContent = "已读 " + read + " / " + total + " 本";
+    document.getElementById("whereText").innerHTML = currentSet
+      ? "你现在的位置：<em>" + currentName + "</em>"
+      : "你现在的位置：<em>全部读完，出师了</em>";
+  }
+  render();
+})();
+</script>
+</body>
+</html>
